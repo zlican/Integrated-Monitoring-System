@@ -32,6 +32,50 @@ export const useTradesStore = defineStore('trades', {
   getters: {
     latestCex3: (state) => [...state.cex].sort((a, b) => b.ts - a.ts).slice(0, 3),
     latestDex3: (state) => [...state.dex].sort((a, b) => b.ts - a.ts).slice(0, 3),
+    
+    // 获取最近1小时的去重DEX消息
+    recentDexMessagesDeduplicated: (state) => {
+      if (!state.dexMessages?.messages) return [];
+      
+      const oneHourAgo = Date.now() - 60 * 60 * 1000; // 1小时前
+      
+      // 过滤最近1小时的消息
+      const recentMessages = state.dexMessages.messages.filter(msg => 
+        new Date(msg.timestamp).getTime() > oneHourAgo
+      );
+      
+      // 按时间倒序排序
+      const sortedMessages = recentMessages.sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      
+      // 基于消息文本中的地址进行去重，保留最新的
+      const addressMap = new Map<string, DexMessage>();
+      
+      for (const message of sortedMessages) {
+        // 提取被两个反引号包裹的地址
+        const addressMatch = message.text.match(/`([^`]+)`/);
+        if (addressMatch) {
+          const address = addressMatch[1];  // 注意是第1个捕获组
+          if (!addressMap.has(address) || 
+              new Date(message.timestamp).getTime() > new Date(addressMap.get(address)!.timestamp).getTime()) {
+            addressMap.set(address, message);
+          }
+        } else {
+          // 如果没有找到地址，使用消息文本的前50个字符作为唯一标识
+          const textKey = message.text.substring(0, 50);
+          if (!addressMap.has(textKey) || 
+              new Date(message.timestamp).getTime() > new Date(addressMap.get(textKey)!.timestamp).getTime()) {
+            addressMap.set(textKey, message);
+          }
+        }
+      }
+      
+      // 返回去重后的消息，按时间倒序
+      return Array.from(addressMap.values()).sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+    }
   },
 
   actions: {

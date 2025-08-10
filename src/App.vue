@@ -32,8 +32,10 @@
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />
-      <TradeList title="CEX交易" :list="latestCex3" />
-      <TradeList title="DEX交易" :list="latestDex3" />
+      <DexMessagesDeduplicatedPanel 
+        :loading="trades.loading.dexMessages"
+        :error="trades.error.dexMessages"
+      />
       <DexInfoPanel />
     </div>
 
@@ -56,10 +58,10 @@ import { apiUtils } from '@/services/api';
 import { API_CONFIG } from '@/config/api';
 import PriceCard from '@/components/PriceCard.vue';
 import TrendPanel from '@/components/TrendPanel.vue';
-import TradeList from '@/components/TradeList.vue';
 import DexInfoPanel from '@/components/DexInfoPanel.vue';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
 import DexMessagesPanel from '@/components/DexMessagesPanel.vue';
+import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
 
 const trades = useTradesStore();
 const market = useMarketStore();
@@ -70,8 +72,6 @@ const apiStatus = ref({
   lastCheck: ''
 });
 
-const latestCex3 = computed(() => trades.latestCex3);
-const latestDex3 = computed(() => trades.latestDex3);
 const cexMessages = computed(() => trades.cexMessages);
 const dexMessages = computed(() => trades.dexMessages);
 
