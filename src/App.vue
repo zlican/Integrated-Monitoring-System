@@ -1,7 +1,7 @@
 <template>
   <main class="app-container">
     <header class="app-header">
-      <h1 class="app-title">交易一体化监控系统</h1>
+      <img src="/banner.png" alt="交易一体化监控系统" class="app-logo" />
       <div class="app-status">
         <div class="status-row">
           <span class="status-indicator" :class="{ online: isOnline }"></span>
@@ -172,6 +172,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.app-logo {
+  height: 100px; /* 根据需求调整 */
+  width: auto;
+}
 .app-container {
   min-height: 100vh;
   padding: 20px;

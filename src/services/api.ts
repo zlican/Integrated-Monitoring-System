@@ -153,7 +153,7 @@ export class CexApiService {
     return await res.json();
   }
 
-  static async getLatestCexMessages(limit: number = 4): Promise<CexMessagesResp> {
+  static async getLatestCexMessages(limit: number = 5): Promise<CexMessagesResp> {
     try {
       const messages = await this.fetchCexMessages(limit);
       
