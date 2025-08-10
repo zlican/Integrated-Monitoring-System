@@ -2,8 +2,8 @@
   <CardFrame :updatedAt="data?.updatedAt">
     <template #title>{{ title }}</template>
     
-    <div v-if="loading" class="loading">加载中...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
+    <div class="trend-container">
+      <div v-if="error" class="error">{{ error }}</div>
     <div v-else-if="data?.symbols" class="trend-content">
       <div v-for="item in data.symbols" :key="item.base" class="symbol-row">
         <span class="symbol-name">{{ item.base }}:</span>
@@ -21,6 +21,7 @@
       </div>
     </div>
     <div v-else class="no-data">暂无数据</div>
+  </div>
   </CardFrame>
 </template>
 
@@ -203,5 +204,19 @@ usePolling(() => {
     min-width: 70px;
     font-size: 13px;
   }
+}
+.loading-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(12, 16, 34, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: #7bd3ff;
+  font-size: 16px;
+  font-weight: 600;
+  z-index: 10;
 }
 </style>

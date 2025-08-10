@@ -4,14 +4,13 @@
       <div class="price-title">
         <span>价格监控</span>
         <button @click="refreshPrice" class="refresh-btn" :disabled="loading">
-          <span v-if="loading">刷新中...</span>
-          <span v-else>🔄</span>
+          <span >🔄</span>
         </button>
       </div>
     </template>
     
-    <div v-if="loading" class="loading">加载中...</div>
-    <div v-else-if="error" class="error">
+    <div class="price-container">
+      <div v-if="error" class="error">
       <div class="error-message">{{ error }}</div>
       <button @click="refreshPrice" class="retry-btn">重试</button>
     </div>
@@ -42,7 +41,8 @@
         </div>
       </div>
     </div>
-    <div v-else class="no-data">暂无数据</div>
+
+  </div>
   </CardFrame>
 </template>
 
@@ -240,5 +240,28 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // �
   color: #7bd3ff;
   padding: 20px;
   opacity: 0.7;
+}
+.price-container {
+  position: relative;   /* 让 loading-overlay 绝对定位生效 */
+  height: 210px;        /* 固定高度220 */
+  overflow-y: auto;     /* 内容超出垂直滚动 */
+  padding-right: 8px;   /* 给滚动条留空间，防止文字挤 */
+  background: rgba(12, 16, 34, 0.2);
+  border-radius: 8px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(12, 16, 34, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* 不阻塞鼠标事件 */
+  color: #7bd3ff;
+  font-size: 16px;
+  font-weight: 600;
+  z-index: 10;
 }
 </style>

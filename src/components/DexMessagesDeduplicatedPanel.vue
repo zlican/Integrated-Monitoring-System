@@ -2,21 +2,10 @@
   <CardFrame :updatedAt="updatedAt">
     <template #title>DEX消息（最近1小时去重）</template>
     
-    <div v-if="loading" class="loading">
-      <div class="loading-spinner"></div>
-      <span>加载中...</span>
-    </div>
+
     
-    <div v-else-if="error" class="error">
-      <span class="error-icon">⚠️</span>
-      <span>{{ error }}</span>
-    </div>
-    
-    <div v-else-if="!deduplicatedMessages || deduplicatedMessages.length === 0" class="no-data">
-      暂无DEX消息
-    </div>
-    
-    <ul v-else class="messages-list">
+    <div class="messages-container">
+      <ul v-if="displayedMessages.length" class="messages-list">
       <li v-for="message in deduplicatedMessages" 
       :key="message.timestamp"
       :class="['message-item clickable', { 'fade-in': firstLoad }]"
@@ -30,11 +19,16 @@
         </div>
       </li>
     </ul>
+    <div v-if="error" class="error">
+        <span class="error-icon">⚠️</span>
+        <span>{{ error }}</span>
+      </div>
+  </div>
   </CardFrame>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import {  computed, ref, watch} from 'vue';
 import type { DexMessage } from '@/types';
 import { useTradesStore } from '@/stores/trades';
 import CardFrame from './CardFrame.vue';
@@ -49,6 +43,18 @@ const trades = useTradesStore();
 
 // 使用去重的DEX消息
 const deduplicatedMessages = computed(() => trades.recentDexMessagesDeduplicated);
+
+// 本地缓存用于显示，防止闪烁
+const displayedMessages = ref<DexMessage[]>([]);
+
+watch(deduplicatedMessages, (newVal) => {
+  if (newVal && newVal.length > 0) {
+    displayedMessages.value = newVal;
+  } else if (!props.loading) {
+    // 数据为空且非加载状态时清空
+    displayedMessages.value = [];
+  }
+}, { immediate: true });
 
 const updatedAt = computed(() => {
   if (deduplicatedMessages.value && deduplicatedMessages.value.length > 0) {
@@ -219,5 +225,19 @@ const highlightAddresses = (text: string) => {
 }
 .clickable {
   cursor: pointer;
+}
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 16, 34, 0.75);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #a0c4ff;
+  font-weight: 600;
+  font-size: 16px;
+  z-index: 10;
+  pointer-events: none;
 }
 </style>
