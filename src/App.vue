@@ -36,13 +36,10 @@
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />
-      <DexInfoPanel />
     </div>
 
     <!-- 模拟数据控制面板 -->
     <div class="control-panel">
-      <button @click="addMockTrade('cex')" class="control-btn">添加CEX交易</button>
-      <button @click="addMockTrade('dex')" class="control-btn">添加DEX交易</button>
       <button @click="refreshAll" class="control-btn refresh">刷新所有数据</button>
     </div>
   </main>
@@ -52,13 +49,10 @@
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { useTradesStore } from '@/stores/trades';
 import { useMarketStore } from '@/stores/market';
-import { usePolling } from '@/composables/usePolling';
-import { useWebSocket } from '@/composables/useWebSocket';
 import { apiUtils } from '@/services/api';
 import { API_CONFIG } from '@/config/api';
 import PriceCard from '@/components/PriceCard.vue';
 import TrendPanel from '@/components/TrendPanel.vue';
-import DexInfoPanel from '@/components/DexInfoPanel.vue';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
 import DexMessagesPanel from '@/components/DexMessagesPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
