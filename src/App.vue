@@ -18,7 +18,7 @@
     <div class="grid top">
       <PriceCard />
       <TrendPanel kind="A" title="趋势分析（短线）" />
-      <TrendPanel kind="B" title="趋势分析（长线）" />
+      <TrendPanel kind="C" title="趋势分析（长线）" />
     </div>
 
     <div class="grid bottom">
@@ -91,7 +91,7 @@ const refreshAll = async () => {
   await Promise.all([
     market.fetchPrice(),
     market.fetchTrendA(),
-    market.fetchTrendB(),
+    market.fetchLongTermTrend(), // 改为长线趋势
     trades.fetchDexInfo()
   ]);
 };
@@ -127,6 +127,11 @@ onMounted(async () => {
   setInterval(() => {
     market.fetchTrendA();
   }, API_CONFIG.POLLING.TREND_INTERVAL);
+
+  // 新增：定期刷新长线趋势分析数据
+  setInterval(() => {
+    market.fetchLongTermTrend();
+  }, 300000); // 5分钟
 });
 
 // 清理事件监听器

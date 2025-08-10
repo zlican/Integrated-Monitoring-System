@@ -107,6 +107,39 @@ export class TrendApiService {
       throw error;
     }
   }
+
+  // 新增：获取长线趋势分析数据
+  static async getAllLongTermTrends(): Promise<LongTermTrendAnalysisAggregatedResp> {
+    try {
+      const intervals = ['4h', '1d', '3d'];
+      const symbols = ['btc', 'eth'];
+      
+      const trends: { [symbol: string]: { [interval: string]: string } } = {};
+      
+      for (const symbol of symbols) {
+        trends[symbol.toUpperCase()] = {};
+        for (const interval of intervals) {
+          try {
+            const trend = symbol === 'btc' 
+              ? await this.getBTCTrend(interval)
+              : await this.getETHTrend(interval);
+            trends[symbol.toUpperCase()][interval] = trend;
+          } catch (error) {
+            console.error(`获取 ${symbol.toUpperCase()} ${interval} 长线趋势失败:`, error);
+            trends[symbol.toUpperCase()][interval] = 'unknown';
+          }
+        }
+      }
+      
+      return {
+        updatedAt: new Date().toISOString(),
+        trends
+      };
+    } catch (error) {
+      console.error('获取所有长线趋势数据失败:', error);
+      throw error;
+    }
+  }
 }
 
 // 通用API工具函数

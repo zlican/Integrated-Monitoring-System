@@ -32,25 +32,43 @@ import CardFrame from './CardFrame.vue';
 import { getTrendColor, getTrendLabel } from '@/utils/color';
 
 const props = defineProps<{
-  kind: 'A' | 'B';
+  kind: 'A' | 'C'; // 只保留A（短线）和C（长线）
   title: string;
   frames?: string[];
 }>();
 
-const frames = computed(() => props.frames ?? ['5m', '15m', '1h']);
+const frames = computed(() => {
+  if (props.kind === 'A') {
+    return props.frames ?? ['5m', '15m', '1h'];
+  } else {
+    return props.frames ?? ['4h', '1d', '3d']; // 长线趋势默认时间框架
+  }
+});
 const market = useMarketStore();
 
-const data = computed(() => 
-  props.kind === 'A' ? market.trendA : market.trendB
-);
-const loading = computed(() => 
-  props.kind === 'A' ? market.loading.trendA : market.loading.trendB
-);
-const error = computed(() => 
-  props.kind === 'A' ? market.error.trendA : market.error.trendB
-);
+const data = computed(() => {
+  if (props.kind === 'A') return market.trendA;
+  return market.longTermTrend; // 长线趋势
+});
+const loading = computed(() => {
+  if (props.kind === 'A') return market.loading.trendA;
+  return market.loading.longTermTrend; // 长线趋势
+});
+const error = computed(() => {
+  if (props.kind === 'A') return market.error.trendA;
+  return market.error.longTermTrend; // 长线趋势
+});
 
 const formatFrameLabel = (frame: string) => {
+  // 为长线趋势添加特殊标签
+  if (props.kind === 'C') {
+    switch (frame) {
+      case '4h': return '4H';
+      case '1d': return '1D';
+      case '3d': return '3D';
+      default: return frame.toUpperCase().replace('M', 'M').replace('H', 'H');
+    }
+  }
   return frame.toUpperCase().replace('M', 'M').replace('H', 'H');
 };
 
@@ -68,20 +86,23 @@ onMounted(() => {
   if (props.kind === 'A') {
     market.fetchTrendA();
   } else {
-    market.fetchTrendB();
+    market.fetchLongTermTrend(); // 长线趋势
   }
 });
 
-// 短线趋势分析使用更快的轮询间隔
-const pollingInterval = props.kind === 'A' ? 5000 : 20000;
+// 短线趋势分析使用更快的轮询间隔，长线趋势使用较慢的轮询间隔
+const pollingInterval = computed(() => {
+  if (props.kind === 'A') return 60000; // 1分钟
+  return 300000; // 5分钟 - 长线趋势更新较慢
+});
 
 usePolling(() => {
   if (props.kind === 'A') {
     market.fetchTrendA();
   } else {
-    market.fetchTrendB();
+    market.fetchLongTermTrend(); // 长线趋势
   }
-}, pollingInterval, false);
+}, pollingInterval.value, false);
 </script>
 
 <style scoped>

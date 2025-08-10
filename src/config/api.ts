@@ -22,6 +22,20 @@ export const API_CONFIG = {
       '5m': '/trend/eth?interval=5m&format=text'
     }
   },
+
+  // 新增：长线趋势分析API端点
+  LONG_TERM_TREND: {
+    BTC: {
+      '4h': '/trend/btc?interval=4h&format=text',
+      '1d': '/trend/btc?interval=1d&format=text',
+      '3d': '/trend/btc?interval=3d&format=text'
+    },
+    ETH: {
+      '4h': '/trend/eth?interval=4h&format=text',
+      '1d': '/trend/eth?interval=1d&format=text',
+      '3d': '/trend/eth?interval=3d&format=text'
+    }
+  },
   
   // 请求配置
   REQUEST: {
@@ -33,7 +47,8 @@ export const API_CONFIG = {
   // 轮询配置
   POLLING: {
     PRICE_INTERVAL: 10000, // 价格更新间隔（10秒）
-    TREND_INTERVAL: 5000,  // 趋势更新间隔（5秒）
+    TREND_INTERVAL: 60000,  // 趋势更新间隔（1分钟）
+    LONG_TERM_TREND_INTERVAL: 300000, // 长线趋势更新间隔（5分钟）
     STATUS_CHECK_INTERVAL: 30000, // 状态检查间隔（30秒）
   },
   

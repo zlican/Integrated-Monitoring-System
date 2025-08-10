@@ -1,291 +1,85 @@
-# 交易监控仪表板
+# 交易一体化监控系统
 
-一个基于 Vue 3 + TypeScript + Pinia 的实时交易监控系统，支持 CEX 和 DEX 交易数据展示。
+## 功能概述
 
-## 功能特性
+本系统是一个完整的交易监控平台，包含以下主要功能：
 
-### 🚀 价格监控
+### 1. 价格监控
+- 实时BTC和ETH价格显示
+- 自动刷新（10秒间隔）
 
-- **实时价格数据**: 集成后端 API 获取 BTC 和 ETH 实时价格
-- **价格变化指示器**: 显示价格涨跌趋势（↗↘→）
-- **自动刷新**: 每 10 秒自动更新价格数据
-- **手动刷新**: 支持手动刷新按钮
-- **错误处理**: API 失败时自动降级到模拟数据
-- **连接状态**: 实时显示后端 API 连接状态
+### 2. 趋势分析
+#### 短线趋势分析（A类型）
+- 时间框架：5分钟、15分钟、1小时
+- 5M和15M：使用EMA指标（金叉/死叉）
+- 1H：使用趋势方向（多/空/盘整）
+- 自动刷新（1分钟间隔）
 
-### 📊 趋势分析
+#### 长线趋势分析（C类型）
+- 时间框架：4小时、1天、3天
+- 支持EMA指标（金叉/死叉）和趋势方向（多/空/盘整）
+- 自动刷新（5分钟间隔）
 
-- **短线趋势分析**: 集成后端 API 获取实时趋势数据
-  - 支持 5 分钟、15 分钟、1 小时时间框架
-  - 5 分钟和 15 分钟使用 EMA 指标（金叉/死叉）
-  - 1 小时使用趋势指标（多头/空头/盘整）
-- **长线趋势分析**: 支持 4 小时、1 天趋势
-- **趋势状态**: 金叉、死叉、多头、空头、盘整等状态显示
-- **多币种支持**: BTC、ETH 等主流币种
-- **实时更新**: 每 5 秒自动更新短线趋势数据
+### 3. 交易监控
+- CEX交易列表
+- DEX交易列表
+- DEX信息面板
 
-### 💱 交易监控
+## 技术架构
 
-- **CEX 交易**: 中心化交易所交易数据
-- **DEX 交易**: 去中心化交易所交易数据
-- **实时更新**: 模拟实时交易数据流
-- **交易详情**: 价格、数量、地址、交易哈希等信息
+### 前端技术栈
+- Vue 3 + TypeScript
+- Pinia状态管理
+- Vite构建工具
 
-### 🔧 系统功能
+### 后端API
+- 价格API：`http://127.0.0.1:8081/api/price/{symbol}?format=text`
+- 趋势API：`http://127.0.0.1:8080/api/trend/{symbol}?interval={interval}&format=text`
 
-- **响应式设计**: 支持移动端和桌面端
-- **状态管理**: 使用 Pinia 进行状态管理
-- **错误处理**: 完善的错误处理和用户提示
-- **配置管理**: 环境配置和 API 配置分离
+### 数据流
+1. API服务层（`src/services/api.ts`）
+2. 状态管理（`src/stores/market.ts`）
+3. 组件展示（`src/components/TrendPanel.vue`）
 
-## 技术栈
+## 趋势分析实现
 
-- **前端框架**: Vue 3 (Composition API)
-- **类型系统**: TypeScript
-- **状态管理**: Pinia
-- **构建工具**: Vite
-- **样式**: CSS3 + 现代设计
+### 短线趋势（5M、15M、1H）
+- 5M和15M：使用EMA指标，返回UPEMA/DOWNEMA，映射为golden/dead（金叉/死叉）
+- 1H：使用趋势方向，返回UP/DOWN/RANGE，映射为bull/bear/flat（多/空/盘整）
 
-## 快速开始
+### 长线趋势（4H、1D、3D）
+- 所有时间框架：支持EMA指标和趋势方向
+- EMA指标：UPEMA→golden（金叉），DOWNEMA→dead（死叉）
+- 趋势方向：UP→bull（多），DOWN→bear（空），RANGE→flat（盘整）
+- 状态映射优先级：EMA指标 > 趋势方向
 
-### 1. 安装依赖
+## 使用方法
 
-```bash
-npm install
-```
-
-### 2. 配置后端 API
-
-确保后端服务运行在 `http://127.0.0.1:8080`，并提供以下 API 端点：
-
-#### 价格 API
-
-- `GET /api/price/btc?format=text` - 获取 BTC 价格
-- `GET /api/price/eth?format=text` - 获取 ETH 价格
-
-#### 趋势分析 API
-
-- `GET /api/trend/btc?interval=1h&format=text` - 获取 BTC 1 小时趋势
-- `GET /api/trend/btc?interval=15m&format=text` - 获取 BTC 15 分钟趋势
-- `GET /api/trend/btc?interval=5m&format=text` - 获取 BTC 5 分钟趋势
-- `GET /api/trend/eth?interval=1h&format=text` - 获取 ETH 1 小时趋势
-- `GET /api/trend/eth?interval=15m&format=text` - 获取 ETH 15 分钟趋势
-- `GET /api/trend/eth?interval=5m&format=text` - 获取 ETH 5 分钟趋势
-
-#### API 返回格式示例
-
-**价格 API:**
-
-```
-BTC Price: 118253.20
-ETH Price: 3250.45
-```
-
-**趋势分析 API:**
-
-```
-BTC Trend: UP          # 1小时 - 多头趋势
-BTC Trend: UPEMA       # 15分钟 - 金叉
-BTC Trend: DOWNEMA     # 5分钟 - 死叉
-ETH Trend: DOWN        # 1小时 - 空头趋势
-ETH Trend: UPEMA       # 15分钟 - 金叉
-ETH Trend: UPEMA       # 5分钟 - 金叉
-```
-
-### 3. 启动开发服务器
-
+### 启动开发服务器
 ```bash
 npm run dev
 ```
 
-### 4. 构建生产版本
-
+### 构建生产版本
 ```bash
 npm run build
 ```
 
-## 项目结构
-
-```
-src/
-├── components/          # Vue组件
-│   ├── PriceCard.vue   # 价格监控卡片
-│   ├── TrendPanel.vue  # 趋势分析面板
-│   ├── TradeList.vue   # 交易列表
-│   └── DexInfoPanel.vue # DEX信息面板
-├── stores/              # Pinia状态管理
-│   ├── market.ts       # 市场数据存储
-│   └── trades.ts       # 交易数据存储
-├── services/            # API服务
-│   └── api.ts          # 价格和趋势分析API服务
-├── config/              # 配置文件
-│   └── api.ts          # API配置
-├── composables/         # 组合式函数
-│   ├── usePolling.ts   # 轮询钩子
-│   └── useWebSocket.ts # WebSocket钩子
-├── utils/               # 工具函数
-│   ├── format.ts       # 格式化工具
-│   └── color.ts        # 颜色工具
-└── types/               # TypeScript类型定义
-    └── index.ts        # 类型定义文件
-```
-
 ## 配置说明
 
-### API 配置 (`src/config/api.ts`)
+### API配置
+- 开发环境：`http://127.0.0.1:8081/api`
+- 生产环境：可配置
 
-```typescript
-export const API_CONFIG = {
-  BASE_URL: "http://127.0.0.1:8081/api",
-  PRICE: {
-    BTC: "/price/btc",
-    ETH: "/price/eth",
-  },
-  TREND: {
-    BTC: {
-      "1h": "/trend/btc?interval=1h&format=text",
-      "15m": "/trend/btc?interval=15m&format=text",
-      "5m": "/trend/btc?interval=5m&format=text",
-    },
-    ETH: {
-      "1h": "/trend/eth?interval=1h&format=text",
-      "15m": "/trend/eth?interval=15m&format=text",
-      "5m": "/trend/eth?interval=5m&format=text",
-    },
-  },
-  REQUEST: {
-    TIMEOUT: 10000, // 请求超时时间
-    RETRY_ATTEMPTS: 3, // 重试次数
-    RETRY_DELAY: 1000, // 重试延迟
-  },
-  POLLING: {
-    PRICE_INTERVAL: 10000, // 价格更新间隔
-    TREND_INTERVAL: 5000, // 趋势更新间隔
-    STATUS_CHECK_INTERVAL: 30000, // 状态检查间隔
-  },
-};
-```
+### 轮询间隔
+- 价格：10秒
+- 短线趋势：1分钟
+- 长线趋势：5分钟
+- 状态检查：30秒
 
-### 环境配置
+## 注意事项
 
-系统自动根据 `import.meta.env.DEV` 判断环境：
-
-- **开发环境**: 启用模拟数据作为备用
-- **生产环境**: 禁用模拟数据，仅使用真实 API
-
-## 使用说明
-
-### 价格监控
-
-1. **自动更新**: 系统每 10 秒自动从后端 API 获取最新价格
-2. **手动刷新**: 点击价格卡片右上角的刷新按钮
-3. **价格变化**: 绿色箭头表示上涨，红色箭头表示下跌
-4. **连接状态**: 头部显示 API 连接状态和响应时间
-
-### 趋势分析
-
-1. **短线趋势（A）**: 显示 5 分钟、15 分钟、1 小时趋势
-   - 5 分钟和 15 分钟：金叉（金色）、死叉（紫色）
-   - 1 小时：多头（绿色）、空头（红色）、盘整（灰色）
-   - 每 5 秒自动更新
-2. **长线趋势（B）**: 显示 4 小时、1 天趋势
-   - 每 20 秒自动更新
-3. **趋势状态**: 不同颜色和样式表示不同趋势状态
-
-### 交易监控
-
-1. **实时交易**: 系统每 3 秒模拟生成新的交易数据
-2. **手动添加**: 使用右下角控制面板添加模拟交易
-3. **数据刷新**: 点击"刷新所有数据"按钮
-
-## 开发说明
-
-### 添加新的价格币种
-
-1. 在 `src/types/index.ts` 中扩展 `PriceResp` 接口
-2. 在 `src/services/api.ts` 中添加新的价格获取方法
-3. 在 `src/stores/market.ts` 中更新价格获取逻辑
-4. 在 `src/components/PriceCard.vue` 中添加新的价格显示
-
-### 添加新的趋势分析币种
-
-1. 在 `src/config/api.ts` 中添加新的趋势分析端点
-2. 在 `src/services/api.ts` 中添加新的趋势获取方法
-3. 在 `src/stores/market.ts` 中更新趋势获取逻辑
-4. 在 `src/components/TrendPanel.vue` 中添加新的趋势显示
-
-### 自定义轮询间隔
-
-修改 `src/config/api.ts` 中的 `POLLING` 配置：
-
-```typescript
-POLLING: {
-  PRICE_INTERVAL: 5000,  // 改为5秒
-  TREND_INTERVAL: 3000,  // 改为3秒
-  STATUS_CHECK_INTERVAL: 60000,  // 改为1分钟
-}
-```
-
-### 错误处理
-
-系统内置了完善的错误处理机制：
-
-- API 请求失败时自动降级到模拟数据
-- 网络超时自动重试
-- 用户友好的错误提示
-- 重试按钮支持
-
-## 故障排除
-
-### 常见问题
-
-1. **价格数据不更新**
-
-   - 检查后端 API 是否正常运行
-   - 查看浏览器控制台是否有错误信息
-   - 确认 API 端点格式正确
-
-2. **趋势分析数据不更新**
-
-   - 检查趋势分析 API 是否正常运行
-   - 确认 API 返回格式符合预期（如 "BTC Trend: UP"）
-   - 查看浏览器控制台是否有错误信息
-
-3. **API 连接失败**
-
-   - 检查后端服务地址和端口
-   - 确认防火墙设置
-   - 查看网络连接状态
-
-4. **数据解析错误**
-   - 确认 API 返回格式符合预期
-   - 检查正则表达式匹配规则
-   - 查看后端日志
-
-### 调试模式
-
-开发环境下，系统会输出详细的调试信息：
-
-- API 请求/响应日志
-- 错误详情
-- 状态变化日志
-
-### API 测试
-
-使用提供的测试脚本验证 API 连接：
-
-```bash
-node test-trend-api.js
-```
-
-## 贡献指南
-
-1. Fork 项目
-2. 创建功能分支
-3. 提交更改
-4. 推送到分支
-5. 创建 Pull Request
-
-## 许可证
-
-MIT License
+1. 确保后端API服务正常运行
+2. 短线趋势和长线趋势都支持EMA指标（金叉/死叉）
+3. 系统会自动降级到模拟数据作为备用
+4. 支持BTC和ETH两个主要交易对
