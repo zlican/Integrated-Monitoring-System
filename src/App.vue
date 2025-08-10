@@ -28,7 +28,7 @@
         :error="trades.error.cexMessages"
       />
       <DexMessagesPanel 
-        :messages="dexMessages?.messages || null"
+        :messages="displayedDexMessages"
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />
@@ -38,7 +38,6 @@
       />
     </div>
 
-    <!-- 模拟数据控制面板 -->
     <div class="control-panel">
       <button @click="refreshAll" class="control-btn refresh">刷新所有数据</button>
     </div>
@@ -46,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useTradesStore } from '@/stores/trades';
 import { useMarketStore } from '@/stores/market';
 import { apiUtils } from '@/services/api';
@@ -67,29 +66,35 @@ const apiStatus = ref({
   lastCheck: ''
 });
 
-const dexMessages = computed(() => trades.dexMessages);
-
-// **重点：维护稳定引用的显示消息列表**
+// 稳定引用，避免 CEX 消息闪烁
 const displayedCexMessages = ref([]);
-
 watch(() => trades.cexMessages?.messages, (newMessages) => {
   if (!newMessages) {
     displayedCexMessages.value = [];
     return;
   }
-
-  // 旧消息映射，方便复用
   const oldMap = new Map(displayedCexMessages.value.map(m => [m.timestamp, m]));
-
-  // 构建新列表，尽可能复用旧对象
   const updated = newMessages.map(m => oldMap.get(m.timestamp) || m);
-
-  // 判断时间戳序列是否变了，不变就不更新引用
   const oldKeys = displayedCexMessages.value.map(m => m.timestamp).join(',');
   const newKeys = updated.map(m => m.timestamp).join(',');
-
   if (oldKeys !== newKeys) {
     displayedCexMessages.value = updated;
+  }
+}, { immediate: true });
+
+// 重点：稳定引用，避免 DEX 消息闪烁
+const displayedDexMessages = ref([]);
+watch(() => trades.dexMessages?.messages, (newMessages) => {
+  if (!newMessages) {
+    displayedDexMessages.value = [];
+    return;
+  }
+  const oldMap = new Map(displayedDexMessages.value.map(m => [m.timestamp, m]));
+  const updated = newMessages.map(m => oldMap.get(m.timestamp) || m);
+  const oldKeys = displayedDexMessages.value.map(m => m.timestamp).join(',');
+  const newKeys = updated.map(m => m.timestamp).join(',');
+  if (oldKeys !== newKeys) {
+    displayedDexMessages.value = updated;
   }
 }, { immediate: true });
 
@@ -111,10 +116,6 @@ const checkApiStatus = async () => {
   }
 };
 
-const addMockTrade = (source: 'cex' | 'dex') => {
-  trades.addMockTrade(source);
-};
-
 const refreshAll = async () => {
   await Promise.all([
     market.fetchPrice(),
@@ -134,8 +135,6 @@ onMounted(async () => {
 
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
-
-  console.log('模拟WebSocket连接...');
 
   setInterval(() => {
     if (Math.random() > 0.7) {

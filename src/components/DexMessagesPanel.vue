@@ -18,9 +18,9 @@
     
     <ul v-else class="messages-list">
       <li
-        v-for="message in messages"
-        :key="message.timestamp"
-        class="message-item fade-in clickable" 
+      v-for="message in messages"
+      :key="message.timestamp"
+      :class="['message-item', { 'fade-in': firstLoad }]"
       @click="handleClick(message.text)">
         <div class="message-header">
           <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
@@ -46,13 +46,19 @@ const props = defineProps<{
   error: string | null;
   updatedAt?: string;
 }>();
+// 1. 用 ref + watch 保持 updatedAt 稳定
+import { ref, watch } from 'vue';
 
-const updatedAt = computed(() => {
-  if (props.messages && props.messages.length > 0) {
-    return new Date(props.messages[0].timestamp).toLocaleTimeString([], { hour12: false });
+const updatedAt = ref('');
+
+watch(() => props.messages, (newMessages) => {
+  if (!newMessages || newMessages.length === 0) {
+    updatedAt.value = '';
+    return;
   }
-  return undefined;
-});
+  const latest = newMessages.reduce((a, b) => new Date(a.timestamp).getTime() >= new Date(b.timestamp).getTime() ? a : b);
+  updatedAt.value = latest.timestamp || '';
+}, { immediate: true });
 // 点击事件处理：从文本提取地址，跳转新窗口
 const handleClick = (text: string) => {
   const match = text.match(/[A-Za-z0-9]{30,}/);
