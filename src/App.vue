@@ -27,6 +27,11 @@
         :loading="trades.loading.cexMessages"
         :error="trades.error.cexMessages"
       />
+      <DexMessagesPanel 
+        :messages="dexMessages?.messages || null"
+        :loading="trades.loading.dexMessages"
+        :error="trades.error.dexMessages"
+      />
       <TradeList title="CEX交易" :list="latestCex3" />
       <TradeList title="DEX交易" :list="latestDex3" />
       <DexInfoPanel />
@@ -54,6 +59,7 @@ import TrendPanel from '@/components/TrendPanel.vue';
 import TradeList from '@/components/TradeList.vue';
 import DexInfoPanel from '@/components/DexInfoPanel.vue';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
+import DexMessagesPanel from '@/components/DexMessagesPanel.vue';
 
 const trades = useTradesStore();
 const market = useMarketStore();
@@ -67,6 +73,7 @@ const apiStatus = ref({
 const latestCex3 = computed(() => trades.latestCex3);
 const latestDex3 = computed(() => trades.latestDex3);
 const cexMessages = computed(() => trades.cexMessages);
+const dexMessages = computed(() => trades.dexMessages);
 
 // 网络状态监听
 const updateOnlineStatus = () => {
@@ -100,7 +107,8 @@ const refreshAll = async () => {
     market.fetchTrendA(),
     market.fetchLongTermTrend(), // 改为长线趋势
     trades.fetchDexInfo(),
-    trades.fetchCexMessages()
+    trades.fetchCexMessages(),
+    trades.fetchDexMessages()
   ]);
 };
 
@@ -110,6 +118,9 @@ onMounted(async () => {
   
   // 获取CEX消息
   await trades.fetchCexMessages();
+  
+  // 获取DEX消息
+  await trades.fetchDexMessages();
   
   // 检查API状态
   await checkApiStatus();
@@ -147,6 +158,11 @@ onMounted(async () => {
   // 定期刷新CEX消息数据
   setInterval(() => {
     trades.fetchCexMessages();
+  }, 30000); // 30秒
+  
+  // 定期刷新DEX消息数据
+  setInterval(() => {
+    trades.fetchDexMessages();
   }, 30000); // 30秒
 });
 

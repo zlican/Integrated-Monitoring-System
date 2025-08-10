@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import type { Trade, DexInfoResp, DexInfoItem, CexMessagesResp, CexMessage } from '@/types';
-import { CexApiService } from '@/services/api';
+import type { Trade, DexInfoResp, DexInfoItem, CexMessagesResp, CexMessage, DexMessagesResp, DexMessage } from '@/types';
+import { CexApiService, DexApiService } from '@/services/api';
 
 export const useTradesStore = defineStore('trades', {
   state: () => ({
@@ -11,17 +11,22 @@ export const useTradesStore = defineStore('trades', {
       cex: false,
       dex: false,
       dexInfo: false,
-      cexMessages: false
+      cexMessages: false,
+      dexMessages: false
     },
     error: {
       cex: null as string | null,
       dex: null as string | null,
       dexInfo: null as string | null,
-      cexMessages: null as string | null
+      cexMessages: null as string | null,
+      dexMessages: null as string | null
     },
     
     // CEX消息相关状态
     cexMessages: null as CexMessagesResp | null,
+    
+    // DEX消息相关状态
+    dexMessages: null as DexMessagesResp | null,
   }),
 
   getters: {
@@ -196,6 +201,42 @@ export const useTradesStore = defineStore('trades', {
         this.cexMessages = fallbackData;
       } finally {
         this.loading.cexMessages = false;
+      }
+    },
+
+    // 获取DEX消息
+    async fetchDexMessages(limit: number = 3) {
+      this.loading.dexMessages = true;
+      this.error.dexMessages = null;
+      
+      try {
+        const messagesData = await DexApiService.getLatestDexMessages(limit);
+        this.dexMessages = messagesData;
+      } catch (error) {
+        this.error.dexMessages = '获取DEX消息失败';
+        console.error('Failed to fetch DEX messages:', error);
+        
+        // 如果API调用失败，使用模拟数据作为备用
+        const fallbackData: DexMessagesResp = {
+          updatedAt: new Date().toISOString(),
+          messages: [
+            {
+              text: "🟣LIZARD\n📬 `347k5f1WLRYe81roRcLBWDR6k3eCRunaqetQPW6pbonk`",
+              timestamp: new Date().toISOString()
+            },
+            {
+              text: "🔥热门代币：SOL突破关键阻力位",
+              timestamp: new Date(Date.now() - 60000).toISOString()
+            },
+            {
+              text: "📊DEX交易量激增：Uniswap V3创新高",
+              timestamp: new Date(Date.now() - 120000).toISOString()
+            }
+          ]
+        };
+        this.dexMessages = fallbackData;
+      } finally {
+        this.loading.dexMessages = false;
       }
     }
   }

@@ -146,3 +146,15 @@ export interface CexMessagesResp {
   updatedAt: string;
   messages: CexMessage[];
 }
+
+// DEX消息类型
+export interface DexMessage {
+  text: string;
+  timestamp: string;
+}
+
+// DEX消息响应类型
+export interface DexMessagesResp {
+  updatedAt: string;
+  messages: DexMessage[];
+}

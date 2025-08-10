@@ -144,7 +144,7 @@ export class TrendApiService {
 
 // CEX消息API服务
 export class CexApiService {
-  private static async fetchCexMessages(limit: number = 3): Promise<CexMessage[]> {
+  private static async fetchCexMessages(limit: number = 4): Promise<CexMessage[]> {
     const url = `http://127.0.0.1:8888/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
     if (!res.ok) {
@@ -153,7 +153,7 @@ export class CexApiService {
     return await res.json();
   }
 
-  static async getLatestCexMessages(limit: number = 3): Promise<CexMessagesResp> {
+  static async getLatestCexMessages(limit: number = 4): Promise<CexMessagesResp> {
     try {
       const messages = await this.fetchCexMessages(limit);
       
@@ -168,6 +168,37 @@ export class CexApiService {
       };
     } catch (error) {
       console.error('获取CEX消息失败:', error);
+      throw error;
+    }
+  }
+}
+
+// DEX消息API服务
+export class DexApiService {
+  private static async fetchDexMessages(limit: number = 3): Promise<DexMessage[]> {
+    const url = `http://127.0.0.1:8889/api/latest-tg-messages?limit=${limit}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`请求DEX消息失败: ${res.statusText}`);
+    }
+    return await res.json();
+  }
+
+  static async getLatestDexMessages(limit: number = 3): Promise<DexMessagesResp> {
+    try {
+      const messages = await this.fetchDexMessages(limit);
+      
+      // 按时间倒序排列
+      const sortedMessages = messages.sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      
+      return {
+        updatedAt: new Date().toISOString(),
+        messages: sortedMessages
+      };
+    } catch (error) {
+      console.error('获取DEX消息失败:', error);
       throw error;
     }
   }
