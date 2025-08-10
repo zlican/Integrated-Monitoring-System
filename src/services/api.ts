@@ -175,7 +175,7 @@ export class CexApiService {
 
 // DEX消息API服务
 export class DexApiService {
-  private static async fetchDexMessages(limit: number = 3): Promise<DexMessage[]> {
+  private static async fetchDexMessages(limit: number = 25): Promise<DexMessage[]> {
     const url = `http://127.0.0.1:8889/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
     if (!res.ok) {
@@ -184,7 +184,7 @@ export class DexApiService {
     return await res.json();
   }
 
-  static async getLatestDexMessages(limit: number = 3): Promise<DexMessagesResp> {
+  static async getLatestDexMessages(limit: number = 25): Promise<DexMessagesResp> {
     try {
       const messages = await this.fetchDexMessages(limit);
       

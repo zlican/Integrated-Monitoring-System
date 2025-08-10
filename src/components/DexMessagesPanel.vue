@@ -17,7 +17,8 @@
     </div>
     
     <ul v-else class="messages-list">
-      <li v-for="(message, index) in messages" :key="index" class="message-item fade-in">
+      <li v-for="(message, index) in messages" :key="index" class="message-item fade-in clickable" 
+      @click="handleClick(message.text)">
         <div class="message-header">
           <span class="message-time">{{ formatTime(message.timestamp) }}</span>
         </div>
@@ -49,6 +50,19 @@ const updatedAt = computed(() => {
   }
   return undefined;
 });
+// 点击事件处理：从文本提取地址，跳转新窗口
+const handleClick = (text: string) => {
+  const match = text.match(/[A-Za-z0-9]{30,}/);
+  if (!match) {
+    alert('未找到有效地址，无法跳转');
+    return;
+  }
+  const address = match[0];
+  const url = `https://web3.okx.com/zh-hans/token/solana/${address}`;
+
+  // 新开一个带参数的新浏览器窗口（非tab）
+  window.open(url, '_blank');
+};
 </script>
 
 <style scoped>
@@ -161,5 +175,8 @@ const updatedAt = computed(() => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+.clickable {
+  cursor: pointer;
 }
 </style>
