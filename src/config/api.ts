@@ -48,7 +48,7 @@ export const API_CONFIG = {
   POLLING: {
     PRICE_INTERVAL: 10000, // 价格更新间隔（10秒）
     TREND_INTERVAL: 60000,  // 趋势更新间隔（1分钟）
-    LONG_TERM_TREND_INTERVAL: 300000, // 长线趋势更新间隔（5分钟）
+    LONG_TERM_TREND_INTERVAL: 1800000, // 长线趋势更新间隔（30分钟）
     STATUS_CHECK_INTERVAL: 30000, // 状态检查间隔（30秒）
   },
   

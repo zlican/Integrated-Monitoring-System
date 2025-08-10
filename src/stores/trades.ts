@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
-import type { Trade, DexInfoResp } from '@/types';
+import type { Trade, DexInfoResp, DexInfoItem, CexMessagesResp, CexMessage } from '@/types';
+import { CexApiService } from '@/services/api';
 
 export const useTradesStore = defineStore('trades', {
   state: () => ({
@@ -9,13 +10,18 @@ export const useTradesStore = defineStore('trades', {
     loading: {
       cex: false,
       dex: false,
-      dexInfo: false
+      dexInfo: false,
+      cexMessages: false
     },
     error: {
       cex: null as string | null,
       dex: null as string | null,
-      dexInfo: null as string | null
-    }
+      dexInfo: null as string | null,
+      cexMessages: null as string | null
+    },
+    
+    // CEX消息相关状态
+    cexMessages: null as CexMessagesResp | null,
   }),
 
   getters: {
@@ -155,6 +161,42 @@ export const useTradesStore = defineStore('trades', {
       }));
       
       this.upsertTrades(source, mockTrades);
+    },
+
+    // 获取CEX消息
+    async fetchCexMessages(limit: number = 3) {
+      this.loading.cexMessages = true;
+      this.error.cexMessages = null;
+      
+      try {
+        const messagesData = await CexApiService.getLatestCexMessages(limit);
+        this.cexMessages = messagesData;
+      } catch (error) {
+        this.error.cexMessages = '获取CEX消息失败';
+        console.error('Failed to fetch CEX messages:', error);
+        
+        // 如果API调用失败，使用模拟数据作为备用
+        const fallbackData: CexMessagesResp = {
+          updatedAt: new Date().toISOString(),
+          messages: [
+            {
+              text: "🎁趋势：BTC🟢 | ETH🟢\n🟢 BTCUSDT   \n",
+              timestamp: new Date().toISOString()
+            },
+            {
+              text: "📊市场更新：BTC突破关键阻力位",
+              timestamp: new Date(Date.now() - 60000).toISOString()
+            },
+            {
+              text: "🔥热门交易对：ETH/USDT成交量激增",
+              timestamp: new Date(Date.now() - 120000).toISOString()
+            }
+          ]
+        };
+        this.cexMessages = fallbackData;
+      } finally {
+        this.loading.cexMessages = false;
+      }
     }
   }
 });

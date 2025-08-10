@@ -134,3 +134,15 @@ export interface TradingPair {
   low24h: number;
   lastUpdated: string;
 }
+
+// CEX消息类型
+export interface CexMessage {
+  text: string;
+  timestamp: string;
+}
+
+// CEX消息响应类型
+export interface CexMessagesResp {
+  updatedAt: string;
+  messages: CexMessage[];
+}

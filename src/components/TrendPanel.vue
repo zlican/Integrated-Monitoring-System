@@ -93,7 +93,7 @@ onMounted(() => {
 // 短线趋势分析使用更快的轮询间隔，长线趋势使用较慢的轮询间隔
 const pollingInterval = computed(() => {
   if (props.kind === 'A') return 60000; // 1分钟
-  return 300000; // 5分钟 - 长线趋势更新较慢
+  return 1800000; // 30分钟 - 长线趋势更新较慢
 });
 
 usePolling(() => {
