@@ -1,7 +1,7 @@
 <template>
   <main class="app-container">
     <header class="app-header">
-      <h1 class="app-title">交易监控仪表板</h1>
+      <h1 class="app-title">交易一体化监控系统</h1>
       <div class="app-status">
         <div class="status-row">
           <span class="status-indicator" :class="{ online: isOnline }"></span>
@@ -121,7 +121,12 @@ onMounted(async () => {
   }, 3000);
   
   // 定期检查API状态
-  setInterval(checkApiStatus, API_CONFIG.POLLING.STATUS_CHECK_INTERVAL); // 使用配置的状态检查间隔
+  setInterval(checkApiStatus, API_CONFIG.POLLING.STATUS_CHECK_INTERVAL);
+  
+  // 定期刷新趋势分析数据（短线）
+  setInterval(() => {
+    market.fetchTrendA();
+  }, API_CONFIG.POLLING.TREND_INTERVAL);
 });
 
 // 清理事件监听器

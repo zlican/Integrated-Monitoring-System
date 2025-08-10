@@ -9,6 +9,20 @@ export const API_CONFIG = {
     ETH: '/price/eth'
   },
   
+  // 趋势分析API端点
+  TREND: {
+    BTC: {
+      '1h': '/trend/btc?interval=1h&format=text',
+      '15m': '/trend/btc?interval=15m&format=text',
+      '5m': '/trend/btc?interval=5m&format=text'
+    },
+    ETH: {
+      '1h': '/trend/eth?interval=1h&format=text',
+      '15m': '/trend/eth?interval=15m&format=text',
+      '5m': '/trend/eth?interval=5m&format=text'
+    }
+  },
+  
   // 请求配置
   REQUEST: {
     TIMEOUT: 10000, // 10秒超时
@@ -19,6 +33,7 @@ export const API_CONFIG = {
   // 轮询配置
   POLLING: {
     PRICE_INTERVAL: 10000, // 价格更新间隔（10秒）
+    TREND_INTERVAL: 5000,  // 趋势更新间隔（5秒）
     STATUS_CHECK_INTERVAL: 30000, // 状态检查间隔（30秒）
   },
   

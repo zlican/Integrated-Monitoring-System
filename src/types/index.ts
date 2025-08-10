@@ -1,6 +1,27 @@
 // 趋势状态类型
 export type TrendState = 'golden' | 'dead' | 'bull' | 'bear' | 'flat';
 
+// 新增：趋势分析API返回的原始状态类型
+export type TrendApiState = 'UP' | 'DOWN' | 'RANGE' | 'UPEMA' | 'DOWNEMA' | 'unknown';
+
+// 趋势分析响应类型
+export interface TrendAnalysisResp {
+  symbol: string;
+  interval: string;
+  trend: TrendApiState;
+  timestamp: string;
+}
+
+// 趋势分析聚合响应类型
+export interface TrendAnalysisAggregatedResp {
+  updatedAt: string;
+  trends: {
+    [symbol: string]: {
+      [interval: string]: TrendApiState;
+    };
+  };
+}
+
 // 价格响应类型
 export interface PriceResp {
   updatedAt: string;

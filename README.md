@@ -15,9 +15,14 @@
 
 ### 📊 趋势分析
 
-- **多时间框架**: 支持 5 分钟、15 分钟、1 小时、4 小时、1 天趋势
+- **短线趋势分析**: 集成后端 API 获取实时趋势数据
+  - 支持 5 分钟、15 分钟、1 小时时间框架
+  - 5 分钟和 15 分钟使用 EMA 指标（金叉/死叉）
+  - 1 小时使用趋势指标（多头/空头/盘整）
+- **长线趋势分析**: 支持 4 小时、1 天趋势
 - **趋势状态**: 金叉、死叉、多头、空头、盘整等状态显示
-- **多币种支持**: BTC、ETH、BNB、SOL、ADA 等主流币种
+- **多币种支持**: BTC、ETH 等主流币种
+- **实时更新**: 每 5 秒自动更新短线趋势数据
 
 ### 💱 交易监控
 
@@ -51,16 +56,40 @@ npm install
 
 ### 2. 配置后端 API
 
-确保后端服务运行在 `http://127.0.0.1:8081`，并提供以下 API 端点：
+确保后端服务运行在 `http://127.0.0.1:8080`，并提供以下 API 端点：
+
+#### 价格 API
 
 - `GET /api/price/btc?format=text` - 获取 BTC 价格
 - `GET /api/price/eth?format=text` - 获取 ETH 价格
 
-API 返回格式示例：
+#### 趋势分析 API
+
+- `GET /api/trend/btc?interval=1h&format=text` - 获取 BTC 1 小时趋势
+- `GET /api/trend/btc?interval=15m&format=text` - 获取 BTC 15 分钟趋势
+- `GET /api/trend/btc?interval=5m&format=text` - 获取 BTC 5 分钟趋势
+- `GET /api/trend/eth?interval=1h&format=text` - 获取 ETH 1 小时趋势
+- `GET /api/trend/eth?interval=15m&format=text` - 获取 ETH 15 分钟趋势
+- `GET /api/trend/eth?interval=5m&format=text` - 获取 ETH 5 分钟趋势
+
+#### API 返回格式示例
+
+**价格 API:**
 
 ```
 BTC Price: 118253.20
 ETH Price: 3250.45
+```
+
+**趋势分析 API:**
+
+```
+BTC Trend: UP          # 1小时 - 多头趋势
+BTC Trend: UPEMA       # 15分钟 - 金叉
+BTC Trend: DOWNEMA     # 5分钟 - 死叉
+ETH Trend: DOWN        # 1小时 - 空头趋势
+ETH Trend: UPEMA       # 15分钟 - 金叉
+ETH Trend: UPEMA       # 5分钟 - 金叉
 ```
 
 ### 3. 启动开发服务器
@@ -88,7 +117,7 @@ src/
 │   ├── market.ts       # 市场数据存储
 │   └── trades.ts       # 交易数据存储
 ├── services/            # API服务
-│   └── api.ts          # 价格API服务
+│   └── api.ts          # 价格和趋势分析API服务
 ├── config/              # 配置文件
 │   └── api.ts          # API配置
 ├── composables/         # 组合式函数
@@ -108,6 +137,22 @@ src/
 ```typescript
 export const API_CONFIG = {
   BASE_URL: "http://127.0.0.1:8081/api",
+  PRICE: {
+    BTC: "/price/btc",
+    ETH: "/price/eth",
+  },
+  TREND: {
+    BTC: {
+      "1h": "/trend/btc?interval=1h&format=text",
+      "15m": "/trend/btc?interval=15m&format=text",
+      "5m": "/trend/btc?interval=5m&format=text",
+    },
+    ETH: {
+      "1h": "/trend/eth?interval=1h&format=text",
+      "15m": "/trend/eth?interval=15m&format=text",
+      "5m": "/trend/eth?interval=5m&format=text",
+    },
+  },
   REQUEST: {
     TIMEOUT: 10000, // 请求超时时间
     RETRY_ATTEMPTS: 3, // 重试次数
@@ -115,6 +160,7 @@ export const API_CONFIG = {
   },
   POLLING: {
     PRICE_INTERVAL: 10000, // 价格更新间隔
+    TREND_INTERVAL: 5000, // 趋势更新间隔
     STATUS_CHECK_INTERVAL: 30000, // 状态检查间隔
   },
 };
@@ -138,9 +184,13 @@ export const API_CONFIG = {
 
 ### 趋势分析
 
-1. **短线趋势**: 显示 5 分钟、15 分钟、1 小时趋势
-2. **长线趋势**: 显示 4 小时、1 天趋势
-3. **趋势状态**: 不同颜色表示不同趋势状态
+1. **短线趋势（A）**: 显示 5 分钟、15 分钟、1 小时趋势
+   - 5 分钟和 15 分钟：金叉（金色）、死叉（紫色）
+   - 1 小时：多头（绿色）、空头（红色）、盘整（灰色）
+   - 每 5 秒自动更新
+2. **长线趋势（B）**: 显示 4 小时、1 天趋势
+   - 每 20 秒自动更新
+3. **趋势状态**: 不同颜色和样式表示不同趋势状态
 
 ### 交易监控
 
@@ -157,6 +207,13 @@ export const API_CONFIG = {
 3. 在 `src/stores/market.ts` 中更新价格获取逻辑
 4. 在 `src/components/PriceCard.vue` 中添加新的价格显示
 
+### 添加新的趋势分析币种
+
+1. 在 `src/config/api.ts` 中添加新的趋势分析端点
+2. 在 `src/services/api.ts` 中添加新的趋势获取方法
+3. 在 `src/stores/market.ts` 中更新趋势获取逻辑
+4. 在 `src/components/TrendPanel.vue` 中添加新的趋势显示
+
 ### 自定义轮询间隔
 
 修改 `src/config/api.ts` 中的 `POLLING` 配置：
@@ -164,6 +221,7 @@ export const API_CONFIG = {
 ```typescript
 POLLING: {
   PRICE_INTERVAL: 5000,  // 改为5秒
+  TREND_INTERVAL: 3000,  // 改为3秒
   STATUS_CHECK_INTERVAL: 60000,  // 改为1分钟
 }
 ```
@@ -187,13 +245,19 @@ POLLING: {
    - 查看浏览器控制台是否有错误信息
    - 确认 API 端点格式正确
 
-2. **API 连接失败**
+2. **趋势分析数据不更新**
+
+   - 检查趋势分析 API 是否正常运行
+   - 确认 API 返回格式符合预期（如 "BTC Trend: UP"）
+   - 查看浏览器控制台是否有错误信息
+
+3. **API 连接失败**
 
    - 检查后端服务地址和端口
    - 确认防火墙设置
    - 查看网络连接状态
 
-3. **数据解析错误**
+4. **数据解析错误**
    - 确认 API 返回格式符合预期
    - 检查正则表达式匹配规则
    - 查看后端日志
@@ -205,6 +269,14 @@ POLLING: {
 - API 请求/响应日志
 - 错误详情
 - 状态变化日志
+
+### API 测试
+
+使用提供的测试脚本验证 API 连接：
+
+```bash
+node test-trend-api.js
+```
 
 ## 贡献指南
 

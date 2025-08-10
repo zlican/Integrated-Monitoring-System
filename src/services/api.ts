@@ -1,4 +1,5 @@
 import { API_CONFIG, getCurrentConfig } from '@/config/api';
+import type { TrendAnalysisResp, TrendAnalysisAggregatedResp } from '@/types';
 
 // 价格API服务
 export class PriceApiService {
@@ -40,6 +41,69 @@ export class PriceApiService {
       return { BTC: btcPrice, ETH: ethPrice };
     } catch (error) {
       console.error('获取所有价格失败:', error);
+      throw error;
+    }
+  }
+}
+
+// 趋势分析API服务
+export class TrendApiService {
+  private static async fetchTrendText(symbol: string, interval: string): Promise<string> {
+    const url = `http://127.0.0.1:8080/api/trend/${symbol}?interval=${interval}&format=text`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`请求 ${symbol} ${interval} 趋势失败: ${res.statusText}`);
+    }
+    return await res.text();
+  }
+
+  private static parseTrendFromText(text: string, symbol: string, interval: string): string {
+    // 从 "BTC Trend: UP" 或 "ETH Trend: UPEMA" 里提取趋势状态
+    const match = text.match(new RegExp(`${symbol} Trend:\\s*(\\w+)`));
+    if (!match) {
+      throw new Error(`无法解析 ${symbol} ${interval} 趋势: ${text}`);
+    }
+    return match[1];
+  }
+
+  static async getBTCTrend(interval: string): Promise<string> {
+    const text = await this.fetchTrendText('btc', interval);
+    return this.parseTrendFromText(text, 'BTC', interval);
+  }
+
+  static async getETHTrend(interval: string): Promise<string> {
+    const text = await this.fetchTrendText('eth', interval);
+    return this.parseTrendFromText(text, 'ETH', interval);
+  }
+
+  static async getAllTrends(): Promise<TrendAnalysisAggregatedResp> {
+    try {
+      const intervals = ['1h', '15m', '5m'];
+      const symbols = ['btc', 'eth'];
+      
+      const trends: { [symbol: string]: { [interval: string]: string } } = {};
+      
+      for (const symbol of symbols) {
+        trends[symbol.toUpperCase()] = {};
+        for (const interval of intervals) {
+          try {
+            const trend = symbol === 'btc' 
+              ? await this.getBTCTrend(interval)
+              : await this.getETHTrend(interval);
+            trends[symbol.toUpperCase()][interval] = trend;
+          } catch (error) {
+            console.error(`获取 ${symbol.toUpperCase()} ${interval} 趋势失败:`, error);
+            trends[symbol.toUpperCase()][interval] = 'unknown';
+          }
+        }
+      }
+      
+      return {
+        updatedAt: new Date().toISOString(),
+        trends
+      };
+    } catch (error) {
+      console.error('获取所有趋势数据失败:', error);
       throw error;
     }
   }
