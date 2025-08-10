@@ -33,6 +33,7 @@
         :error="trades.error.dexMessages"
       />
       <DexMessagesDeduplicatedPanel 
+        :messages="displayedDexMessages"
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />

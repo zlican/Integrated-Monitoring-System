@@ -20,7 +20,7 @@
       <li
       v-for="message in messages"
       :key="message.timestamp"
-      :class="['message-item', { 'fade-in': firstLoad }]"
+      :class="['message-item clickable', { 'fade-in': firstLoad }]"
       @click="handleClick(message.text)">
         <div class="message-header">
           <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
