@@ -23,7 +23,7 @@
 
     <div class="grid bottom">
       <CexMessagesPanel 
-        :messages="cexMessages?.messages || null"
+        :messages="displayedCexMessages"
         :loading="trades.loading.cexMessages"
         :error="trades.error.cexMessages"
       />
@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useTradesStore } from '@/stores/trades';
 import { useMarketStore } from '@/stores/market';
 import { apiUtils } from '@/services/api';
@@ -59,6 +59,7 @@ import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPa
 
 const trades = useTradesStore();
 const market = useMarketStore();
+
 const isOnline = ref(navigator.onLine);
 const apiStatus = ref({
   connected: false,
@@ -66,15 +67,36 @@ const apiStatus = ref({
   lastCheck: ''
 });
 
-const cexMessages = computed(() => trades.cexMessages);
 const dexMessages = computed(() => trades.dexMessages);
 
-// 网络状态监听
+// **重点：维护稳定引用的显示消息列表**
+const displayedCexMessages = ref([]);
+
+watch(() => trades.cexMessages?.messages, (newMessages) => {
+  if (!newMessages) {
+    displayedCexMessages.value = [];
+    return;
+  }
+
+  // 旧消息映射，方便复用
+  const oldMap = new Map(displayedCexMessages.value.map(m => [m.timestamp, m]));
+
+  // 构建新列表，尽可能复用旧对象
+  const updated = newMessages.map(m => oldMap.get(m.timestamp) || m);
+
+  // 判断时间戳序列是否变了，不变就不更新引用
+  const oldKeys = displayedCexMessages.value.map(m => m.timestamp).join(',');
+  const newKeys = updated.map(m => m.timestamp).join(',');
+
+  if (oldKeys !== newKeys) {
+    displayedCexMessages.value = updated;
+  }
+}, { immediate: true });
+
 const updateOnlineStatus = () => {
   isOnline.value = navigator.onLine;
 };
 
-// 检查API状态
 const checkApiStatus = async () => {
   try {
     const status = await apiUtils.getApiStatus();
@@ -89,17 +111,15 @@ const checkApiStatus = async () => {
   }
 };
 
-// 模拟实时数据
 const addMockTrade = (source: 'cex' | 'dex') => {
   trades.addMockTrade(source);
 };
 
-// 刷新所有数据
 const refreshAll = async () => {
   await Promise.all([
     market.fetchPrice(),
     market.fetchTrendA(),
-    market.fetchLongTermTrend(), // 改为长线趋势
+    market.fetchLongTermTrend(),
     trades.fetchDexInfo(),
     trades.fetchCexMessages(),
     trades.fetchDexMessages()
@@ -107,26 +127,16 @@ const refreshAll = async () => {
 };
 
 onMounted(async () => {
-  // 初始化数据
   await trades.initSnapshots();
-  
-  // 获取CEX消息
   await trades.fetchCexMessages();
-  
-  // 获取DEX消息
   await trades.fetchDexMessages();
-  
-  // 检查API状态
   await checkApiStatus();
-  
-  // 监听网络状态
+
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
-  
-  // 模拟WebSocket连接（实际使用时替换为真实WebSocket）
+
   console.log('模拟WebSocket连接...');
-  
-  // 模拟实时交易数据
+
   setInterval(() => {
     if (Math.random() > 0.7) {
       trades.addMockTrade('cex');
@@ -135,32 +145,26 @@ onMounted(async () => {
       trades.addMockTrade('dex');
     }
   }, 3000);
-  
-  // 定期检查API状态
+
   setInterval(checkApiStatus, API_CONFIG.POLLING.STATUS_CHECK_INTERVAL);
-  
-  // 定期刷新趋势分析数据（短线）
+
   setInterval(() => {
     market.fetchTrendA();
   }, API_CONFIG.POLLING.TREND_INTERVAL);
 
-  // 新增：定期刷新长线趋势分析数据
   setInterval(() => {
     market.fetchLongTermTrend();
-  }, 300000); // 5分钟
-  
-  // 定期刷新CEX消息数据
+  }, 300000);
+
   setInterval(() => {
     trades.fetchCexMessages();
-  }, 30000); // 30秒
-  
-  // 定期刷新DEX消息数据
+  }, 30000);
+
   setInterval(() => {
     trades.fetchDexMessages();
-  }, 30000); // 30秒
+  }, 30000);
 });
 
-// 清理事件监听器
 onBeforeUnmount(() => {
   window.removeEventListener('online', updateOnlineStatus);
   window.removeEventListener('offline', updateOnlineStatus);
@@ -300,4 +304,4 @@ onBeforeUnmount(() => {
     font-size: 11px;
   }
 }
-</style>
+</style> 

@@ -17,11 +17,14 @@
     </div>
     
     <ul v-else class="messages-list">
-      <li v-for="(message, index) in messages" :key="index" class="message-item fade-in">
+      <li
+        v-for="message in messages"
+        :key="message.timestamp"
+        class="message-item"
+      >
         <div class="message-header">
           <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
         </div>
-        
         <div class="message-content">
           <pre class="message-text">{{ message.text }}</pre>
         </div>

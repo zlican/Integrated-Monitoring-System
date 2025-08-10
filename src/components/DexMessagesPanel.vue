@@ -17,7 +17,10 @@
     </div>
     
     <ul v-else class="messages-list">
-      <li v-for="(message, index) in messages" :key="index" class="message-item fade-in clickable" 
+      <li
+        v-for="message in messages"
+        :key="message.timestamp"
+        class="message-item fade-in clickable" 
       @click="handleClick(message.text)">
         <div class="message-header">
           <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
