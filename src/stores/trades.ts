@@ -213,7 +213,7 @@ export const useTradesStore = defineStore('trades', {
     },
 
     // 获取CEX消息
-    async fetchCexMessages(limit: number = 3) {
+    async fetchCexMessages(limit: number = 4) {
       this.loading.cexMessages = true;
       this.error.cexMessages = null;
       
@@ -249,7 +249,7 @@ export const useTradesStore = defineStore('trades', {
     },
 
     // 获取DEX消息
-    async fetchDexMessages(limit: number = 3) {
+    async fetchDexMessages(limit: number = 25) {
       this.loading.dexMessages = true;
       this.error.dexMessages = null;
       

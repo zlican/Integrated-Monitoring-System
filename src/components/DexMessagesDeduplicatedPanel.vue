@@ -20,7 +20,7 @@
       <li v-for="(message, index) in deduplicatedMessages" :key="index" class="message-item fade-in clickable" 
       @click="handleClick(message.text)">
         <div class="message-header">
-          <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+          <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
         </div>
         
         <div class="message-content">
@@ -36,7 +36,7 @@ import { computed } from 'vue';
 import type { DexMessage } from '@/types';
 import { useTradesStore } from '@/stores/trades';
 import CardFrame from './CardFrame.vue';
-import { formatTime } from '@/utils/format';
+import { formatTimeMessage } from '@/utils/format';
 
 const props = defineProps<{
   loading: boolean;
@@ -85,7 +85,25 @@ const highlightAddresses = (text: string) => {
   list-style: none;
   margin: 0;
   padding: 0;
+
+  /* 固定高度为5个li的高度 */
+  max-height: calc((60px + 12px) * 7); /* 60px是li的高度，12px是gap */
+  overflow-y: auto; /* 只纵向滚动 */
+  overflow-x: hidden; /* 禁止横向滚动 */
 }
+
+/* 滚动条美化（可选） */
+.messages-list::-webkit-scrollbar {
+  width: 6px;
+}
+.messages-list::-webkit-scrollbar-thumb {
+  background: rgba(160, 196, 255, 0.5);
+  border-radius: 3px;
+}
+.messages-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 
 .message-item {
   background: rgba(0, 0, 0, 0.25);

@@ -19,7 +19,7 @@
     <ul v-else class="messages-list">
       <li v-for="(message, index) in messages" :key="index" class="message-item fade-in">
         <div class="message-header">
-          <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+          <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
         </div>
         
         <div class="message-content">
@@ -34,7 +34,7 @@
 import { computed } from 'vue';
 import type { CexMessage } from '@/types';
 import CardFrame from './CardFrame.vue';
-import { formatTime } from '@/utils/format';
+import { formatTimeMessage } from '@/utils/format';
 
 const props = defineProps<{
   messages: CexMessage[] | null;
@@ -44,10 +44,18 @@ const props = defineProps<{
 }>();
 
 const updatedAt = computed(() => {
-  if (props.messages && props.messages.length > 0) {
-    return new Date(props.messages[0].timestamp).toLocaleTimeString([], { hour12: false });
-  }
-  return undefined;
+  if (!props.messages || props.messages.length === 0) return '';
+
+  // 用一个稳健的比较函数来找最新（处理可能的多位毫秒）
+  const toMs = (s: string | undefined) => {
+    if (!s) return -Infinity;
+    const fixed = s.replace(/(\.\d{3})\d+/, '$1'); // 截取到毫秒
+    const d = new Date(fixed);
+    return isNaN(d.getTime()) ? -Infinity : d.getTime();
+  };
+
+  const latest = props.messages.reduce((a, b) => (toMs(a.timestamp) >= toMs(b.timestamp) ? a : b));
+  return latest.timestamp || '';
 });
 </script>
 
@@ -59,7 +67,25 @@ const updatedAt = computed(() => {
   list-style: none;
   margin: 0;
   padding: 0;
+
+  /* 固定高度为5个li的高度 */
+  max-height: calc((60px + 12px) * 7); /* 60px是li的高度，12px是gap */
+  overflow-y: auto; /* 只纵向滚动 */
+  overflow-x: hidden; /* 禁止横向滚动 */
 }
+
+/* 滚动条美化（可选） */
+.messages-list::-webkit-scrollbar {
+  width: 6px;
+}
+.messages-list::-webkit-scrollbar-thumb {
+  background: rgba(160, 196, 255, 0.5);
+  border-radius: 3px;
+}
+.messages-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 
 .message-item {
   background: rgba(0, 0, 0, 0.25);
