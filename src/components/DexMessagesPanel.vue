@@ -80,8 +80,8 @@ const handleClick = (text: string) => {
   flex-direction: column;
   gap: 12px;
   list-style: none;
-  margin: 0;
-  padding: 0;
+  margin: 2px;
+  padding: 2px;
 
   /* 固定高度为5个li的高度 */
   max-height: calc((108px + 12px) * 5); /* 60px是li的高度，12px是gap */

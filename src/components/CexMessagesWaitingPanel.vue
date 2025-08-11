@@ -46,14 +46,14 @@ const displayTime = (ts?: string) => {
   flex-direction: column;
   gap: 12px;
   list-style: none;
-  margin: 0;
-  padding: 0;
+  margin: 2px;
+  padding: 2px;
   max-height: calc((108px + 12px) * 5);
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-.messages-list::-webkit-scrollbar { width: 6px; }
+.messages-list::-webkit-scrollbar { width: 3px; }
 .messages-list::-webkit-scrollbar-thumb { background: rgba(160, 196, 255, 0.5); border-radius: 3px; }
 .messages-list::-webkit-scrollbar-track { background: transparent; }
 
