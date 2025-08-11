@@ -1,9 +1,6 @@
 <template>
   <CardFrame :updatedAt="updatedAt">
     <template #title>DEX消息（最近1小时去重）</template>
-    
-
-    
     <div class="messages-container">
       <ul v-if="displayedMessages.length" class="messages-list">
       <li v-for="message in deduplicatedMessages" 
@@ -19,10 +16,6 @@
         </div>
       </li>
     </ul>
-    <div v-if="error" class="error">
-        <span class="error-icon">⚠️</span>
-        <span>{{ error }}</span>
-      </div>
   </div>
   </CardFrame>
 </template>
@@ -111,7 +104,35 @@ const highlightAddresses = (text: string) => {
 .messages-list::-webkit-scrollbar-track {
   background: transparent;
 }
+/* 高亮第一个 li（保留圆角） */
+.messages-list li:first-child {
+  border-radius: 20px; /* 保留原有圆角 */
+  background: linear-gradient(
+    135deg,
+    rgba(0, 128, 255, 0.15) 0%,
+    rgba(0, 128, 255, 0.05) 40%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  padding: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
+  border: 1px solid rgba(160, 196, 255, 0.6);
+  box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
 
+/* 悬停增强效果（均匀发光，不集中在右上角） */
+.messages-list li:first-child:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 128, 255, 0.25) 0%,
+    rgba(0, 128, 255, 0.15) 40%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  box-shadow: 0 0 10px rgba(160, 196, 255, 0.7);
+  transform: translateX(4px);
+}
 
 .message-item {
   background: rgba(0, 0, 0, 0.25);

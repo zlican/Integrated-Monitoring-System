@@ -228,18 +228,6 @@ export const useTradesStore = defineStore('trades', {
         const fallbackData: CexMessagesResp = {
           updatedAt: new Date().toISOString(),
           messages: [
-            {
-              text: "🎁趋势：BTC🟢 | ETH🟢\n🟢 BTCUSDT   \n",
-              timestamp: new Date().toISOString()
-            },
-            {
-              text: "📊市场更新：BTC突破关键阻力位",
-              timestamp: new Date(Date.now() - 60000).toISOString()
-            },
-            {
-              text: "🔥热门交易对：ETH/USDT成交量激增",
-              timestamp: new Date(Date.now() - 120000).toISOString()
-            }
           ]
         };
         this.cexMessages = fallbackData;
@@ -263,20 +251,7 @@ export const useTradesStore = defineStore('trades', {
         // 如果API调用失败，使用模拟数据作为备用
         const fallbackData: DexMessagesResp = {
           updatedAt: new Date().toISOString(),
-          messages: [
-            {
-              text: "🟣LIZARD\n📬 `347k5f1WLRYe81roRcLBWDR6k3eCRunaqetQPW6pbonk`",
-              timestamp: new Date().toISOString()
-            },
-            {
-              text: "🔥热门代币：SOL突破关键阻力位",
-              timestamp: new Date(Date.now() - 60000).toISOString()
-            },
-            {
-              text: "📊DEX交易量激增：Uniswap V3创新高",
-              timestamp: new Date(Date.now() - 120000).toISOString()
-            }
-          ]
+          messages: []
         };
         this.dexMessages = fallbackData;
       } finally {
