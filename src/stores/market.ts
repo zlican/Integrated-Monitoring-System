@@ -4,15 +4,20 @@ import { PriceApiService, TrendApiService } from '@/services/api';
 
 // 趋势状态映射函数
 const mapTrendState = (apiState: TrendApiState, interval: string): string => {
-  if (interval === '1h') {
+  if (interval === '1h' || interval === '3d') {
     switch (apiState) {
       case 'UP': return 'bull';
       case 'DOWN': return 'bear';
       case 'RANGE': return 'flat';
       default: return 'flat';
     }
+  } else if (interval === '15m' || interval === '1d') {
+    switch (apiState) {
+      case 'UPEMAGT': return 'goldengt';
+      case 'DOWNEMALT': return 'deadlt';
+      default: return 'flat';
+    }
   } else {
-    // 5m 和 15m 使用EMA指标
     switch (apiState) {
       case 'UPEMA': return 'golden';
       case 'DOWNEMA': return 'dead';
@@ -25,10 +30,12 @@ const mapTrendState = (apiState: TrendApiState, interval: string): string => {
 const mapLongTermTrendState = (apiState: TrendApiState): string => {
   switch (apiState) {
     case 'UPEMA': return 'golden';    // 金叉
+    case 'UPEMAGT': return 'goldengt'; //金叉之上
     case 'DOWNEMA': return 'dead';    // 死叉
+    case 'DOWNEMALT': return 'deadlt'; //死叉之下
     case 'UP': return 'bull';         // 多头
     case 'DOWN': return 'bear';       // 空头
-    case 'RANGE': return 'flat';      // 乱
+    case 'RANGE': return 'flat';      // 随机漫步
     default: return 'flat';
   }
 };
@@ -111,24 +118,7 @@ export const useMarketStore = defineStore('market', {
         // 如果API调用失败，使用模拟数据作为备用
         const fallbackData: TrendResp = {
           updatedAt: new Date().toISOString(),
-          symbols: [
-            {
-              base: 'BTC',
-              frames: {
-                '5m': ['golden', 'dead', 'flat'][Math.floor(Math.random() * 3)],
-                '15m': ['golden', 'dead', 'flat'][Math.floor(Math.random() * 3)],
-                '1h': ['bull', 'bear', 'flat'][Math.floor(Math.random() * 3)]
-              }
-            },
-            {
-              base: 'ETH',
-              frames: {
-                '5m': ['golden', 'dead', 'flat'][Math.floor(Math.random() * 3)],
-                '15m': ['golden', 'dead', 'flat'][Math.floor(Math.random() * 3)],
-                '1h': ['bull', 'bear', 'flat'][Math.floor(Math.random() * 3)]
-              }
-            }
-          ]
+          symbols: []
         };
         this.trendA = fallbackData;
       } finally {
@@ -166,24 +156,7 @@ export const useMarketStore = defineStore('market', {
         // 如果API调用失败，使用模拟数据作为备用
         const fallbackData: TrendResp = {
           updatedAt: new Date().toISOString(),
-          symbols: [
-            {
-              base: 'BTC',
-              frames: {
-                '4h': ['golden', 'dead', 'bull', 'bear', 'flat'][Math.floor(Math.random() * 5)],
-                '1d': ['golden', 'dead', 'bull', 'bear', 'flat'][Math.floor(Math.random() * 5)],
-                '3d': ['golden', 'dead', 'bull', 'bear', 'flat'][Math.floor(Math.random() * 5)]
-              }
-            },
-            {
-              base: 'ETH',
-              frames: {
-                '4h': ['golden', 'dead', 'bull', 'bear', 'flat'][Math.floor(Math.random() * 5)],
-                '1d': ['golden', 'dead', 'bull', 'bear', 'flat'][Math.floor(Math.random() * 5)],
-                '3d': ['golden', 'dead', 'bull', 'bear', 'flat'][Math.floor(Math.random() * 5)]
-              }
-            }
-          ]
+          symbols: []
         };
         this.longTermTrend = fallbackData;
       } finally {

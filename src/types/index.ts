@@ -1,11 +1,8 @@
 // 趋势状态类型
-export type TrendState = 'golden' | 'dead' | 'bull' | 'bear' | 'flat';
+export type TrendState = 'golden' | 'goldengt' | 'dead' | 'deadlt' | 'bull' | 'bear' | 'flat';
 
 // 新增：趋势分析API返回的原始状态类型
-export type TrendApiState = 'UP' | 'DOWN' | 'RANGE' | 'UPEMA' | 'DOWNEMA' | 'unknown';
-
-// 新增：长线趋势状态类型（4H、1D、3D使用相同的状态映射）
-export type LongTermTrendState = 'bull' | 'bear' | 'flat';
+export type TrendApiState = 'UP' | 'DOWN' | 'RANGE' | 'UPEMA' | 'DOWNEMA' | 'UPEMAGT' | 'DOWNEMALT' | 'unknown';
 
 // 趋势分析响应类型
 export interface TrendAnalysisResp {

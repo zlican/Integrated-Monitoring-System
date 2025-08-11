@@ -2,14 +2,16 @@
 export const getTrendColor = (state: string): string => {
   switch (state) {
     case 'golden':
+    case 'goldengt':
     case 'bull':
-      return '#19c37d'; // 绿色 - 金叉/多
+      return '#ffc107'; //  金叉/多
     case 'dead':
+    case 'deadlt':
     case 'bear':
-      return '#ff5a5f'; // 红色 - 死叉/空
+      return '#9c27b0'; // 死叉/空
     case 'flat':
     default:
-      return '#00c2ff'; // 青色 - 盘整
+      return '#9e9e9e'; // 随机漫步
   }
 };
 
@@ -18,14 +20,18 @@ export const getTrendLabel = (state: string): string => {
   switch (state) {
     case 'golden':
       return '金叉';
+    case 'goldengt':
+      return '金叉之上';
     case 'dead':
       return '死叉';
+    case 'deadlt':
+      return '死叉之下';
     case 'bull':
-      return '多';
+      return '做多';
     case 'bear':
-      return '空';
+      return '做空';
     case 'flat':
-      return '盘整';
+      return '随机漫步';
     default:
       return '—';
   }

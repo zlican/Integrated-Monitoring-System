@@ -82,6 +82,8 @@ const getTrendClass = (trend: string) => {
     'trend-bear': trend === 'bear',
     'trend-golden': trend === 'golden',
     'trend-dead': trend === 'dead',
+    'trend-goldengt': trend === 'goldengt',
+    'trend-deadlt': trend === 'deadlt',
     'trend-flat': trend === 'flat'
   };
 };
@@ -112,10 +114,12 @@ usePolling(() => {
 <style scoped>
 .trend-container {
   --color-primary: #00f6ff;
-  --color-bull: #19c37d;
-  --color-bear: #ff5a5f;
+  --color-bull: #ffc107;
+  --color-bear: #9c27b0;
   --color-golden: #ffc107;
   --color-dead: #9c27b0;
+  --color-goldengt: #ffc107;
+  --color-deadlt: #9c27b0;
   --color-flat: #9e9e9e;
 
   --bg-card: #0d1b36;
@@ -224,25 +228,25 @@ usePolling(() => {
 
 /* 状态颜色 */
 .trend-bull {
-  background: rgba(25, 195, 125, 0.2);
-  border-color: rgba(25, 195, 125, 0.6);
-  color: #a2f5d3;
-  text-shadow: 0 0 10px #19c37d;
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.6);
+  color: #fff399;
+  text-shadow: 0 0 10px #ffc107;
 }
 .trend-bull::before {
-  background: var(--color-bull);
-  box-shadow: 0 0 12px var(--color-bull);
+  background: var(--color-golden);
+  box-shadow: 0 0 12px var(--color-golden);
 }
 
 .trend-bear {
-  background: rgba(255, 90, 95, 0.2);
-  border-color: rgba(255, 90, 95, 0.6);
-  color: #ffb3b6;
-  text-shadow: 0 0 10px #ff5a5f;
+  background: rgba(156, 39, 176, 0.2);
+  border-color: rgba(156, 39, 176, 0.6);
+  color: #d6a1f9;
+  text-shadow: 0 0 10px #9c27b0;
 }
 .trend-bear::before {
-  background: var(--color-bear);
-  box-shadow: 0 0 12px var(--color-bear);
+  background: var(--color-dead);
+  box-shadow: 0 0 12px var(--color-dead);
 }
 
 .trend-golden {
@@ -256,6 +260,19 @@ usePolling(() => {
   box-shadow: 0 0 12px var(--color-golden);
 }
 
+.trend-goldengt {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.6);
+  color: #fff399;
+  text-shadow: 0 0 10px #ffc107;
+}
+
+.trend-goldengt::before {
+  background: var(--color-goldengt);
+  box-shadow: 0 0 12px var(--color-goldengt);
+}
+
+
 .trend-dead {
   background: rgba(156, 39, 176, 0.2);
   border-color: rgba(156, 39, 176, 0.6);
@@ -265,6 +282,17 @@ usePolling(() => {
 .trend-dead::before {
   background: var(--color-dead);
   box-shadow: 0 0 12px var(--color-dead);
+}
+
+.trend-deadlt {
+  background: rgba(156, 39, 176, 0.2);
+  border-color: rgba(156, 39, 176, 0.6);
+  color: #d6a1f9;
+  text-shadow: 0 0 10px #9c27b0;
+}
+.trend-deadlt::before {
+  background: var(--color-deadlt);
+  box-shadow: 0 0 12px var(--color-deadlt);
 }
 
 .trend-flat {
