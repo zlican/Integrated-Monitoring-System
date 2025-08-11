@@ -88,7 +88,7 @@ const highlightAddresses = (text: string) => {
   padding: 0;
 
   /* 固定高度为5个li的高度 */
-  max-height: calc((60px + 12px) * 7); /* 60px是li的高度，12px是gap */
+  max-height: calc((108px + 12px) * 5); /* 60px是li的高度，12px是gap */
   overflow-y: auto; /* 只纵向滚动 */
   overflow-x: hidden; /* 禁止横向滚动 */
 }
@@ -174,7 +174,7 @@ const highlightAddresses = (text: string) => {
 .message-time {
   opacity: 0.8;
   font-variant-numeric: tabular-nums;
-  font-size: 12px;
+  font-size: 18px;
   color: #a0c4ff;
 }
 
@@ -186,7 +186,7 @@ const highlightAddresses = (text: string) => {
   margin: 0;
   white-space: pre-wrap;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 18px;
   line-height: 1.4;
   color: #ffffff;
   background: transparent;
@@ -274,7 +274,7 @@ const highlightAddresses = (text: string) => {
   align-items: center;
   color: #a0c4ff;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   z-index: 10;
   pointer-events: none;
 }

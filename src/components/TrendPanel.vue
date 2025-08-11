@@ -1,6 +1,11 @@
 <template>
   <CardFrame :updatedAt="data?.updatedAt">
-    <template #title>{{ title }}</template>
+    <template #title>
+      <div class="price-title">
+        {{ title }}
+      </div>
+      
+    </template>
     
     <div class="trend-container">
     <div v-if="data?.symbols" class="trend-content">
@@ -106,44 +111,76 @@ usePolling(() => {
 
 <style scoped>
 .trend-container {
-  --accent: #7bd3ff;
-  --row-border: rgba(255,255,255,0.05);
+  --color-primary: #00f6ff;
+  --color-bull: #19c37d;
+  --color-bear: #ff5a5f;
+  --color-golden: #ffc107;
+  --color-dead: #9c27b0;
+  --color-flat: #9e9e9e;
+
+  --bg-card: #0d1b36;
+  --bg-row: rgba(13, 27, 54, 0.3);
+  --border-row: rgba(255, 255, 255, 0.1);
+  --shadow-glow: rgba(0, 246, 255, 0.3);
+
   --chip-radius: 999px;
+
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--color-primary);
+  user-select: none;
 }
 
 .trend-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+}
+.price-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
 }
 
 .symbol-row {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--row-border);
-  transition: background 0.18s ease, transform 0.18s ease;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--bg-row);
+  border: 1px solid var(--border-row);
+  box-shadow:
+    0 0 10px rgba(0, 246, 255, 0.1),
+    inset 0 0 10px rgba(0, 255, 255, 0.06);
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
 }
+
 .symbol-row:hover {
-  transform: translateY(-2px);
-  background: rgba(255,255,255,0.04);
+  transform: translateY(-4px);
+  background: rgba(13, 27, 54, 0.5);
+  box-shadow:
+    0 0 28px #00f6ffcc,
+    inset 0 0 24px #00ffe6cc;
 }
 
 .symbol-name {
-  min-width: 84px;
-  font-weight: 700;
-  font-size: 18px; /* 字体加大 */
-  color: var(--accent);
-  letter-spacing: 0.3px;
+  min-width: 90px;
+  font-size: 20px;
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  user-select: text;
 }
 
 .trend-frames {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
   align-items: center;
 }
@@ -152,93 +189,119 @@ usePolling(() => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 12px;
-  background: rgba(255,255,255,0.03);
+  padding: 9px 16px;
+  background: rgba(13, 27, 54, 0.6);
   border-radius: var(--chip-radius);
-  border: 1px solid rgba(255,255,255,0.05);
-  min-width: 64px;
-  font-size: 14px; /* 字体加大 */
-  font-weight: 600;
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  min-width: 72px;
+  font-size: 15px;
+  font-weight: 400;
   white-space: nowrap;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-  color: rgba(255,255,255,0.92);
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow:
+    0 0 6px rgba(0, 246, 255, 0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
 }
+
 .trend-frame::before {
   content: "";
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   display: inline-block;
   flex: 0 0 auto;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
-/* hover 动画：更轻盈的抬起感 */
+/* hover 动画，发光浮起 */
 .trend-frame:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(3,8,20,0.55);
+  transform: translateY(-6px);
+  box-shadow:
+    0 0 30px var(--shadow-glow);
   cursor: pointer;
 }
-/* 状态颜色统一对比度 */
+
+/* 状态颜色 */
 .trend-bull {
-  background: rgba(25,195,125,0.12);
-  border-color: rgba(25,195,125,0.3);
-  color: #9fffd5;
+  background: rgba(25, 195, 125, 0.2);
+  border-color: rgba(25, 195, 125, 0.6);
+  color: #a2f5d3;
+  text-shadow: 0 0 10px #19c37d;
 }
 .trend-bull::before {
-  background: #19c37d;
+  background: var(--color-bull);
+  box-shadow: 0 0 12px var(--color-bull);
 }
 
 .trend-bear {
-  background: rgba(255,90,95,0.12);
-  border-color: rgba(255,90,95,0.3);
+  background: rgba(255, 90, 95, 0.2);
+  border-color: rgba(255, 90, 95, 0.6);
   color: #ffb3b6;
+  text-shadow: 0 0 10px #ff5a5f;
 }
 .trend-bear::before {
-  background: #ff5a5f;
+  background: var(--color-bear);
+  box-shadow: 0 0 12px var(--color-bear);
 }
 
 .trend-golden {
-  background: rgba(255,193,7,0.12);
-  border-color: rgba(255,193,7,0.3);
-  color: #ffe58a;
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.6);
+  color: #fff399;
+  text-shadow: 0 0 10px #ffc107;
 }
 .trend-golden::before {
-  background: #ffc107;
+  background: var(--color-golden);
+  box-shadow: 0 0 12px var(--color-golden);
 }
 
 .trend-dead {
-  background: rgba(156,39,176,0.12);
-  border-color: rgba(156,39,176,0.3);
-  color: #e7b3ff;
+  background: rgba(156, 39, 176, 0.2);
+  border-color: rgba(156, 39, 176, 0.6);
+  color: #d6a1f9;
+  text-shadow: 0 0 10px #9c27b0;
 }
 .trend-dead::before {
-  background: #9c27b0;
+  background: var(--color-dead);
+  box-shadow: 0 0 12px var(--color-dead);
 }
 
 .trend-flat {
-  background: rgba(158,158,158,0.12);
-  border-color: rgba(158,158,158,0.3);
-  color: #cccccc;
+  background: rgba(158, 158, 158, 0.2);
+  border-color: rgba(158, 158, 158, 0.6);
+  color: #dedede;
+  text-shadow: 0 0 10px #9e9e9e;
 }
 .trend-flat::before {
-  background: #9e9e9e;
+  background: var(--color-flat);
+  box-shadow: 0 0 12px var(--color-flat);
 }
 
+/* 加载、错误、无数据提示 */
 .loading, .error, .no-data {
   text-align: center;
-  color: var(--accent);
-  padding: 14px;
-  opacity: 0.85;
+  color: var(--color-primary);
+  padding: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.9;
 }
 
+/* 响应式处理 */
 @media (max-width: 768px) {
   .symbol-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 10px;
   }
   .symbol-name {
     min-width: 0;
+  }
+  .trend-frame {
+    min-width: auto;
+    padding: 8px 14px;
+    font-size: 14px;
   }
 }
 </style>

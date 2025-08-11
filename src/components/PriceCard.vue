@@ -102,19 +102,14 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // �
   user-select: none;
 }
 
-/* 标题和刷新按钮 */
 .price-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
-  font-weight: 100;
   font-size: 18px;
   letter-spacing: 0.06em;
   color: var(--color-primary);
-  text-shadow:
-    0 0 6px var(--color-primary),
-    0 0 14px var(--color-primary);
 }
 
 
@@ -126,7 +121,6 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // �
   top: 18px;
   font-size: 13px;
   color: #5599bb;
-  font-weight: 400;
   letter-spacing: 0.02em;
   user-select: none;
 }
@@ -141,8 +135,8 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // �
   margin-bottom: 16px;
   padding: 20px 28px;
   box-shadow:
-    0 0 18px #007abfcc,
-    inset 0 0 16px #00ffe699;
+    0 0 6px #007abfcc,
+    inset 0 0 6px #00ffe699;
   cursor: default;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
@@ -157,17 +151,16 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // �
 /* 标签 */
 .label {
   flex-shrink: 0;
-  font-weight: 400;
   font-size: 20px;
   width: 45px;
   color: var(--color-primary);
-  text-shadow: 0 0 6px var(--color-primary);
 }
 
 /* 价格值 */
 .value {
   font-weight: 400;
   font-size: 20px;
+  margin-left: 200px;
   color: var(--color-primary);
   font-variant-numeric: tabular-nums;
   text-shadow:
@@ -188,7 +181,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // �
 /* 涨跌箭头 */
 .change-indicator {
   font-size: 28px;
-  font-weight: 900;
+  font-weight: 800;
   width: 32px;
   text-align: center;
   user-select: none;

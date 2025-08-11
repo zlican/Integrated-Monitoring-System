@@ -26,4 +26,8 @@ defineProps<{
 .card-body {
   min-height: 60px;
 }
+
+.updated {
+  font-size: 18px;
+}
 </style>
