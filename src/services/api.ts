@@ -1,5 +1,5 @@
 import { API_CONFIG, getCurrentConfig } from '@/config/api';
-import type { TrendAnalysisResp, TrendAnalysisAggregatedResp } from '@/types';
+import type { TrendAnalysisAggregatedResp, LongTermTrendAnalysisAggregatedResp, CexMessage, CexMessagesResp, DexMessage, DexMessagesResp, TrendApiState } from '@/types';
 
 // 价格API服务
 export class PriceApiService {
@@ -81,7 +81,7 @@ export class TrendApiService {
       const intervals = ['1h', '15m', '5m'];
       const symbols = ['btc', 'eth'];
       
-      const trends: { [symbol: string]: { [interval: string]: string } } = {};
+      const trends: { [symbol: string]: { [interval: string]: TrendApiState } } = {} as any;
       
       for (const symbol of symbols) {
         trends[symbol.toUpperCase()] = {};
@@ -90,7 +90,7 @@ export class TrendApiService {
             const trend = symbol === 'btc' 
               ? await this.getBTCTrend(interval)
               : await this.getETHTrend(interval);
-            trends[symbol.toUpperCase()][interval] = trend;
+            trends[symbol.toUpperCase()][interval] = trend as TrendApiState;
           } catch (error) {
             console.error(`获取 ${symbol.toUpperCase()} ${interval} 趋势失败:`, error);
             trends[symbol.toUpperCase()][interval] = 'unknown';
@@ -114,7 +114,7 @@ export class TrendApiService {
       const intervals = ['4h', '1d', '3d'];
       const symbols = ['btc', 'eth'];
       
-      const trends: { [symbol: string]: { [interval: string]: string } } = {};
+      const trends: { [symbol: string]: { [interval: string]: TrendApiState } } = {} as any;
       
       for (const symbol of symbols) {
         trends[symbol.toUpperCase()] = {};
@@ -123,7 +123,7 @@ export class TrendApiService {
             const trend = symbol === 'btc' 
               ? await this.getBTCTrend(interval)
               : await this.getETHTrend(interval);
-            trends[symbol.toUpperCase()][interval] = trend;
+            trends[symbol.toUpperCase()][interval] = trend as TrendApiState;
           } catch (error) {
             console.error(`获取 ${symbol.toUpperCase()} ${interval} 长线趋势失败:`, error);
             trends[symbol.toUpperCase()][interval] = 'unknown';
@@ -171,6 +171,62 @@ export class CexApiService {
       throw error;
     }
   }
+
+  // 新增：CEX等待区消息（后端仅返回1条混合文本，需要前端拆分）
+  private static async fetchCexWaitingRaw(limit: number = 1): Promise<CexMessage[]> {
+    const url = `http://127.0.0.1:8888/api/latest-tg-messages-waiting?limit=${limit}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`请求CEX等待区消息失败: ${res.statusText}`);
+    }
+    return await res.json();
+  }
+
+  private static splitMixedMessages(text: string): string[] {
+    if (!text) return [];
+    // 先按多空行分块
+    const blocks = text
+      .split(/\n\s*\n+/)
+      .map(b => b.trim())
+      .filter(Boolean);
+
+    if (blocks.length > 1) return blocks;
+
+    // 退化为按分隔线或常见标记拆分
+    const bySeparators = text
+      .split(/\n?[-=]{3,}\n?|^-- .* --$|^=== .* ===$/gmi)
+      .map(s => s.trim())
+      .filter(Boolean);
+    if (bySeparators.length > 1) return bySeparators;
+
+    // 最后按单行切分并合并非空行，按每3~8行组合一条，避免过碎
+    const lines = text.split(/\n+/).map(l => l.trim()).filter(Boolean);
+    if (lines.length <= 1) return [text.trim()];
+    const chunkSize = Math.min(8, Math.max(3, Math.floor(lines.length / 5) || 3));
+    const chunks: string[] = [];
+    for (let i = 0; i < lines.length; i += chunkSize) {
+      chunks.push(lines.slice(i, i + chunkSize).join('\n'));
+    }
+    return chunks;
+  }
+
+  static async getCexWaitingMessages(limit: number = 1): Promise<CexMessagesResp> {
+    const raw = await this.fetchCexWaitingRaw(limit);
+    const first = raw?.[0];
+    if (!first) {
+      return { updatedAt: new Date().toISOString(), messages: [] };
+    }
+    const parts = this.splitMixedMessages(first.text);
+    const messages: CexMessage[] = parts.map((p) => ({
+      text: p,
+      // 使用后端时间；为避免key冲突，前端可拼接idx
+      timestamp: first.timestamp
+    }));
+    return {
+      updatedAt: new Date().toISOString(),
+      messages
+    };
+  }
 }
 
 // DEX消息API服务
@@ -201,6 +257,55 @@ export class DexApiService {
       console.error('获取DEX消息失败:', error);
       throw error;
     }
+  }
+
+  // 新增：DEX等待区消息（后端仅返回1条混合文本，需要前端拆分）
+  private static async fetchDexWaitingRaw(limit: number = 1): Promise<DexMessage[]> {
+    const url = `http://127.0.0.1:8889/api/latest-tg-messages-waiting?limit=${limit}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`请求DEX等待区消息失败: ${res.statusText}`);
+    }
+    return await res.json();
+  }
+
+  private static splitMixedMessages(text: string): string[] {
+    if (!text) return [];
+    const blocks = text
+      .split(/\n\s*\n+/)
+      .map(b => b.trim())
+      .filter(Boolean);
+    if (blocks.length > 1) return blocks;
+    const bySeparators = text
+      .split(/\n?[-=]{3,}\n?|^-- .* --$|^=== .* ===$/gmi)
+      .map(s => s.trim())
+      .filter(Boolean);
+    if (bySeparators.length > 1) return bySeparators;
+    const lines = text.split(/\n+/).map(l => l.trim()).filter(Boolean);
+    if (lines.length <= 1) return [text.trim()];
+    const chunkSize = Math.min(8, Math.max(3, Math.floor(lines.length / 5) || 3));
+    const chunks: string[] = [];
+    for (let i = 0; i < lines.length; i += chunkSize) {
+      chunks.push(lines.slice(i, i + chunkSize).join('\n'));
+    }
+    return chunks;
+  }
+
+  static async getDexWaitingMessages(limit: number = 1): Promise<DexMessagesResp> {
+    const raw = await this.fetchDexWaitingRaw(limit);
+    const first = raw?.[0];
+    if (!first) {
+      return { updatedAt: new Date().toISOString(), messages: [] };
+    }
+    const parts = this.splitMixedMessages(first.text);
+    const messages: DexMessage[] = parts.map((p) => ({
+      text: p,
+      timestamp: first.timestamp
+    }));
+    return {
+      updatedAt: new Date().toISOString(),
+      messages
+    };
   }
 }
 

@@ -27,15 +27,29 @@
         :loading="trades.loading.cexMessages"
         :error="trades.error.cexMessages"
       />
+
       <DexMessagesPanel 
         :messages="displayedDexMessages"
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />
+
       <DexMessagesDeduplicatedPanel 
         :messages="displayedDexMessages"
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
+      />
+      <CexMessagesWaitingPanel
+        :messages="trades.cexWaitingMessages?.messages || []"
+        :loading="trades.loading.cexWaiting"
+        :error="trades.error.cexWaiting"
+        :updatedAt="trades.cexWaitingMessages?.updatedAt"
+      />
+      <DexMessagesWaitingPanel
+        :messages="trades.dexWaitingMessages?.messages || []"
+        :loading="trades.loading.dexWaiting"
+        :error="trades.error.dexWaiting"
+        :updatedAt="trades.dexWaitingMessages?.updatedAt"
       />
     </div>
 
@@ -46,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useTradesStore } from '@/stores/trades';
 import { useMarketStore } from '@/stores/market';
 import { apiUtils } from '@/services/api';
@@ -54,7 +68,9 @@ import { API_CONFIG } from '@/config/api';
 import PriceCard from '@/components/PriceCard.vue';
 import TrendPanel from '@/components/TrendPanel.vue';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
+import CexMessagesWaitingPanel from '@/components/CexMessagesWaitingPanel.vue';
 import DexMessagesPanel from '@/components/DexMessagesPanel.vue';
+import DexMessagesWaitingPanel from '@/components/DexMessagesWaitingPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
 
 const trades = useTradesStore();
@@ -68,14 +84,15 @@ const apiStatus = ref({
 });
 
 // 稳定引用，避免 CEX 消息闪烁
-const displayedCexMessages = ref([]);
+import type { CexMessage, DexMessage } from '@/types';
+const displayedCexMessages = ref<CexMessage[]>([]);
 watch(() => trades.cexMessages?.messages, (newMessages) => {
   if (!newMessages) {
     displayedCexMessages.value = [];
     return;
   }
-  const oldMap = new Map(displayedCexMessages.value.map(m => [m.timestamp, m]));
-  const updated = newMessages.map(m => oldMap.get(m.timestamp) || m);
+  const oldMap = new Map(displayedCexMessages.value.map((m: CexMessage) => [m.timestamp, m]));
+  const updated = newMessages.map((m: CexMessage) => oldMap.get(m.timestamp) || m);
   const oldKeys = displayedCexMessages.value.map(m => m.timestamp).join(',');
   const newKeys = updated.map(m => m.timestamp).join(',');
   if (oldKeys !== newKeys) {
@@ -84,14 +101,14 @@ watch(() => trades.cexMessages?.messages, (newMessages) => {
 }, { immediate: true });
 
 // 重点：稳定引用，避免 DEX 消息闪烁
-const displayedDexMessages = ref([]);
+const displayedDexMessages = ref<DexMessage[]>([]);
 watch(() => trades.dexMessages?.messages, (newMessages) => {
   if (!newMessages) {
     displayedDexMessages.value = [];
     return;
   }
-  const oldMap = new Map(displayedDexMessages.value.map(m => [m.timestamp, m]));
-  const updated = newMessages.map(m => oldMap.get(m.timestamp) || m);
+  const oldMap = new Map(displayedDexMessages.value.map((m: DexMessage) => [m.timestamp, m]));
+  const updated = newMessages.map((m: DexMessage) => oldMap.get(m.timestamp) || m);
   const oldKeys = displayedDexMessages.value.map(m => m.timestamp).join(',');
   const newKeys = updated.map(m => m.timestamp).join(',');
   if (oldKeys !== newKeys) {
@@ -131,7 +148,9 @@ const refreshAll = async () => {
 onMounted(async () => {
   await trades.initSnapshots();
   await trades.fetchCexMessages();
+  await trades.fetchCexWaitingMessages();
   await trades.fetchDexMessages();
+  await trades.fetchDexWaitingMessages();
   await checkApiStatus();
 
   window.addEventListener('online', updateOnlineStatus);
@@ -162,6 +181,14 @@ onMounted(async () => {
 
   setInterval(() => {
     trades.fetchDexMessages();
+  }, 30000);
+
+  setInterval(() => {
+    trades.fetchDexWaitingMessages();
+  }, 30000);
+
+  setInterval(() => {
+    trades.fetchCexWaitingMessages();
   }, 30000);
 });
 
