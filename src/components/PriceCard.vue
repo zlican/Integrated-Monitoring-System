@@ -1,18 +1,15 @@
 <template>
+  <div class="price-monitor">
   <CardFrame :updatedAt="data?.updatedAt">
     <template #title>
       <div class="price-title">
         <span>价格监控</span>
-        <button @click="refreshPrice" class="refresh-btn" :disabled="loading">
-          <span >🔄</span>
-        </button>
       </div>
     </template>
     
     <div class="price-container">
       <div v-if="error" class="error">
       <div class="error-message">{{ error }}</div>
-      <button @click="refreshPrice" class="retry-btn">重试</button>
     </div>
     <div v-else-if="data" class="price-content">
       <div class="price-row">
@@ -33,6 +30,7 @@
 
   </div>
   </CardFrame>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -89,168 +87,164 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // �
 </script>
 
 <style scoped>
+.price-monitor {
+  --color-primary: #00f6ff;
+  --color-positive: #00f67d;
+  --color-negative: #ff4a5f;
+  --color-neutral: #7bd3ff;
+  --bg-dark: #0b1324;
+  --bg-card: #0d1b36;
+  --shadow-glow: rgba(0, 246, 255, 0.3);
+
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--color-primary);
+  user-select: none;
+}
+
+/* 标题和刷新按钮 */
 .price-title {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-weight: 100;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+  text-shadow:
+    0 0 6px var(--color-primary),
+    0 0 14px var(--color-primary);
 }
 
-.refresh-btn {
-  background: none;
-  border: none;
-  color: #7bd3ff;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  font-size: 16px;
+
+
+/* 更新时间 */
+.updated-time {
+  position: absolute;
+  right: 28px;
+  top: 18px;
+  font-size: 13px;
+  color: #5599bb;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  user-select: none;
 }
 
-.refresh-btn:hover:not(:disabled) {
-  background: rgba(123, 211, 255, 0.1);
-  transform: rotate(180deg);
-}
-
-.refresh-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.price-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
+/* 价格行卡片 */
 .price-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 16px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  padding: 20px 28px;
+  box-shadow:
+    0 0 18px #007abfcc,
+    inset 0 0 16px #00ffe699;
+  cursor: default;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.price-row:last-of-type {
-  border-bottom: none;
+.price-row:hover {
+  box-shadow:
+    0 0 28px #00f6ffcc,
+    inset 0 0 24px #00ffe6cc;
+  transform: translateY(-4px);
 }
 
+/* 标签 */
 .label {
-  font-size: 16px;
-  color: #a0c4ff;
-  font-weight: 500;
-}
-
-.value {
+  flex-shrink: 0;
+  font-weight: 400;
   font-size: 20px;
-  font-weight: 700;
-  color: #00d4ff;
-  font-variant-numeric: tabular-nums;
+  width: 45px;
+  color: var(--color-primary);
+  text-shadow: 0 0 6px var(--color-primary);
 }
 
+/* 价格值 */
+.value {
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+  text-shadow:
+    0 0 8px var(--color-primary),
+    0 0 18px var(--color-primary);
+  min-width: 140px;
+}
+
+/* 价格前美元符号 */
+.value::before {
+  margin-right: 6px;
+  color: var(--color-primary);
+  text-shadow:
+    0 0 6px var(--color-primary),
+    0 0 14px var(--color-primary);
+}
+
+/* 涨跌箭头 */
 .change-indicator {
-  font-size: 18px;
-  font-weight: bold;
-  margin-left: 8px;
+  font-size: 28px;
+  font-weight: 900;
+  width: 32px;
+  text-align: center;
+  user-select: none;
+  transition: transform 0.3s ease;
+  line-height: 1;
 }
 
 .change-indicator.positive {
-  color: #19c37d;
+  color: var(--color-positive);
+  text-shadow:
+    0 0 10px var(--color-positive),
+    0 0 20px var(--color-positive);
+  animation: bounceUp 1.2s ease infinite;
 }
 
 .change-indicator.negative {
-  color: #ff5a5f;
+  color: var(--color-negative);
+  text-shadow:
+    0 0 10px var(--color-negative),
+    0 0 20px var(--color-negative);
+  animation: bounceDown 1.2s ease infinite;
 }
 
 .change-indicator.neutral {
-  color: #7bd3ff;
+  color: var(--color-neutral);
+  text-shadow: 0 0 10px var(--color-neutral);
 }
 
-.price-stats {
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+/* 动画 */
+@keyframes bounceUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
 }
 
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.stat-label {
-  color: #7bd3ff;
-  opacity: 0.8;
-}
-
-.stat-value {
-  color: #a0c4ff;
-  font-weight: 500;
-}
-
+/* 错误区 */
 .error {
+  background: #33000022;
+  padding: 28px 20px;
+  border-radius: 18px;
+  margin: 30px 12px;
   text-align: center;
-  padding: 20px;
+  box-shadow:
+    0 0 24px var(--color-negative);
 }
 
 .error-message {
-  color: #ff5a5f;
-  margin-bottom: 12px;
-  font-size: 14px;
+  color: var(--color-negative);
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 16px;
+  text-shadow: 0 0 8px var(--color-negative);
 }
 
-.retry-btn {
-  background: rgba(255, 90, 95, 0.2);
-  border: 1px solid rgba(255, 90, 95, 0.4);
-  color: #ff5a5f;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 12px;
-}
 
-.retry-btn:hover {
-  background: rgba(255, 90, 95, 0.3);
-  border-color: rgba(255, 90, 95, 0.6);
-}
-
-.no-data {
-  text-align: center;
-  color: #7bd3ff;
-  padding: 20px;
-  opacity: 0.7;
-}
-
-.loading {
-  text-align: center;
-  color: #7bd3ff;
-  padding: 20px;
-  opacity: 0.7;
-}
-.price-container {
-  position: relative;   /* 让 loading-overlay 绝对定位生效 */
-  height: 210px;        /* 固定高度220 */
-  overflow-y: auto;     /* 内容超出垂直滚动 */
-  padding-right: 8px;   /* 给滚动条留空间，防止文字挤 */
-  background: rgba(12, 16, 34, 0.2);
-  border-radius: 8px;
-}
-
-.loading-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(12, 16, 34, 0.7);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none; /* 不阻塞鼠标事件 */
-  color: #7bd3ff;
-  font-size: 16px;
-  font-weight: 600;
-  z-index: 10;
-}
 </style>
