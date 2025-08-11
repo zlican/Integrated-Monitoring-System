@@ -118,8 +118,25 @@ const highlightAddresses = (text: string) => {
   margin-right: 12px;
   border: 1px solid rgba(160, 196, 255, 0.6);
   box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+  animation: highlightPulse 2.5s ease-in-out infinite;
+  position: relative;
   transform: scale(1.02);
   transition: all 0.3s ease;
+}
+/* 呼吸动画 */
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(160, 196, 255, 0.7);
+    transform: scale(1.015);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+    transform: scale(1);
+  }
 }
 
 /* 悬停增强效果（均匀发光，不集中在右上角） */

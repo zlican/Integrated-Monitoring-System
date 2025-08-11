@@ -29,17 +29,6 @@
           {{ getPriceChangeIndicator(data.ETH, previousPrice?.ETH) }}
         </span>
       </div>
-      
-      <div class="price-stats">
-        <div class="stat-item">
-          <span class="stat-label">最后更新:</span>
-          <span class="stat-value">{{ formatUpdateTime(data.updatedAt) }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">数据源:</span>
-          <span class="stat-value">实时API</span>
-        </div>
-      </div>
     </div>
 
   </div>
