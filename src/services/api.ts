@@ -184,30 +184,11 @@ export class CexApiService {
 
   private static splitMixedMessages(text: string): string[] {
     if (!text) return [];
-    // 先按多空行分块
-    const blocks = text
-      .split(/\n\s*\n+/)
-      .map(b => b.trim())
-      .filter(Boolean);
-
-    if (blocks.length > 1) return blocks;
-
-    // 退化为按分隔线或常见标记拆分
-    const bySeparators = text
-      .split(/\n?[-=]{3,}\n?|^-- .* --$|^=== .* ===$/gmi)
-      .map(s => s.trim())
-      .filter(Boolean);
-    if (bySeparators.length > 1) return bySeparators;
-
-    // 最后按单行切分并合并非空行，按每3~8行组合一条，避免过碎
-    const lines = text.split(/\n+/).map(l => l.trim()).filter(Boolean);
-    if (lines.length <= 1) return [text.trim()];
-    const chunkSize = Math.min(8, Math.max(3, Math.floor(lines.length / 5) || 3));
-    const chunks: string[] = [];
-    for (let i = 0; i < lines.length; i += chunkSize) {
-      chunks.push(lines.slice(i, i + chunkSize).join('\n'));
-    }
-    return chunks;
+    // 直接按行拆分，去空行和空白
+    return text
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
   }
 
   static async getCexWaitingMessages(limit: number = 1): Promise<CexMessagesResp> {
@@ -217,10 +198,10 @@ export class CexApiService {
       return { updatedAt: new Date().toISOString(), messages: [] };
     }
     const parts = this.splitMixedMessages(first.text);
-    const messages: CexMessage[] = parts.map((p) => ({
-      text: p,
-      // 使用后端时间；为避免key冲突，前端可拼接idx
-      timestamp: first.timestamp
+    const messages: CexMessage[] = parts.map((line, idx) => ({
+      text: line,
+      // 拼接idx避免key冲突
+      timestamp: first.timestamp + `-${idx}`
     }));
     return {
       updatedAt: new Date().toISOString(),
@@ -271,23 +252,20 @@ export class DexApiService {
 
   private static splitMixedMessages(text: string): string[] {
     if (!text) return [];
-    const blocks = text
-      .split(/\n\s*\n+/)
-      .map(b => b.trim())
-      .filter(Boolean);
-    if (blocks.length > 1) return blocks;
-    const bySeparators = text
-      .split(/\n?[-=]{3,}\n?|^-- .* --$|^=== .* ===$/gmi)
-      .map(s => s.trim())
-      .filter(Boolean);
-    if (bySeparators.length > 1) return bySeparators;
-    const lines = text.split(/\n+/).map(l => l.trim()).filter(Boolean);
-    if (lines.length <= 1) return [text.trim()];
-    const chunkSize = Math.min(8, Math.max(3, Math.floor(lines.length / 5) || 3));
+  
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
     const chunks: string[] = [];
-    for (let i = 0; i < lines.length; i += chunkSize) {
-      chunks.push(lines.slice(i, i + chunkSize).join('\n'));
+  
+    // 每两行为一条消息
+    for (let i = 0; i < lines.length; i += 2) {
+      const firstLine = lines[i] || '';
+      const secondLine = lines[i + 1] || '';
+      const combined = [firstLine, secondLine].filter(Boolean).join('\n');
+      if (combined) {
+        chunks.push(combined);
+      }
     }
+  
     return chunks;
   }
 
