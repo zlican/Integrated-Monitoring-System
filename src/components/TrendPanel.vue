@@ -3,8 +3,7 @@
     <template #title>{{ title }}</template>
     
     <div class="trend-container">
-      <div v-if="error" class="error">{{ error }}</div>
-    <div v-else-if="data?.symbols" class="trend-content">
+    <div v-if="data?.symbols" class="trend-content">
       <div v-for="item in data.symbols" :key="item.base" class="symbol-row">
         <span class="symbol-name">{{ item.base }}:</span>
         <div class="trend-frames">
@@ -13,7 +12,6 @@
             :key="frame" 
             class="trend-frame"
             :class="getTrendClass(item.frames[frame])"
-            :style="{ color: getTrendColor(item.frames[frame]) }"
           >
             {{ formatFrameLabel(frame) }}({{ getTrendLabel(item.frames[frame]) }})
           </span>
@@ -107,116 +105,140 @@ usePolling(() => {
 </script>
 
 <style scoped>
+.trend-container {
+  --accent: #7bd3ff;
+  --row-border: rgba(255,255,255,0.05);
+  --chip-radius: 999px;
+}
+
 .trend-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .symbol-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--row-border);
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.symbol-row:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.04);
 }
 
 .symbol-name {
+  min-width: 84px;
   font-weight: 700;
-  color: #7bd3ff;
-  font-size: 16px;
-  min-width: 60px;
+  font-size: 18px; /* 字体加大 */
+  color: var(--accent);
+  letter-spacing: 0.3px;
 }
 
 .trend-frames {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-left: 20px;
+  gap: 10px;
+  flex: 1;
+  align-items: center;
 }
 
 .trend-frame {
-  font-size: 14px;
-  font-weight: 500;
-  padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  min-width: 80px;
-  text-align: center;
-  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--chip-radius);
+  border: 1px solid rgba(255,255,255,0.05);
+  min-width: 64px;
+  font-size: 14px; /* 字体加大 */
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  color: rgba(255,255,255,0.92);
+}
+.trend-frame::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
 }
 
+/* hover 动画：更轻盈的抬起感 */
 .trend-frame:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(3,8,20,0.55);
+  cursor: pointer;
 }
-
+/* 状态颜色统一对比度 */
 .trend-bull {
-  background: rgba(25, 195, 125, 0.2);
-  border: 1px solid rgba(25, 195, 125, 0.4);
+  background: rgba(25,195,125,0.12);
+  border-color: rgba(25,195,125,0.3);
+  color: #9fffd5;
+}
+.trend-bull::before {
+  background: #19c37d;
 }
 
 .trend-bear {
-  background: rgba(255, 90, 95, 0.2);
-  border: 1px solid rgba(255, 90, 95, 0.4);
+  background: rgba(255,90,95,0.12);
+  border-color: rgba(255,90,95,0.3);
+  color: #ffb3b6;
+}
+.trend-bear::before {
+  background: #ff5a5f;
 }
 
 .trend-golden {
-  background: rgba(255, 193, 7, 0.2);
-  border: 1px solid rgba(255, 193, 7, 0.4);
+  background: rgba(255,193,7,0.12);
+  border-color: rgba(255,193,7,0.3);
+  color: #ffe58a;
+}
+.trend-golden::before {
+  background: #ffc107;
 }
 
 .trend-dead {
-  background: rgba(156, 39, 176, 0.2);
-  border: 1px solid rgba(156, 39, 176, 0.4);
+  background: rgba(156,39,176,0.12);
+  border-color: rgba(156,39,176,0.3);
+  color: #e7b3ff;
+}
+.trend-dead::before {
+  background: #9c27b0;
 }
 
 .trend-flat {
-  background: rgba(158, 158, 158, 0.2);
-  border: 1px solid rgba(158, 158, 158, 0.4);
+  background: rgba(158,158,158,0.12);
+  border-color: rgba(158,158,158,0.3);
+  color: #cccccc;
+}
+.trend-flat::before {
+  background: #9e9e9e;
 }
 
-.loading {
+.loading, .error, .no-data {
   text-align: center;
-  color: #7bd3ff;
-  padding: 20px;
-  opacity: 0.7;
-}
-
-.error {
-  text-align: center;
-  color: #ff5a5f;
-  padding: 20px;
-  opacity: 0.8;
-}
-
-.no-data {
-  text-align: center;
-  color: #7bd3ff;
-  padding: 20px;
-  opacity: 0.7;
+  color: var(--accent);
+  padding: 14px;
+  opacity: 0.85;
 }
 
 @media (max-width: 768px) {
-  .trend-frames {
-    margin-left: 0;
+  .symbol-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
-  
-  .trend-frame {
-    min-width: 70px;
-    font-size: 13px;
+  .symbol-name {
+    min-width: 0;
   }
-}
-.loading-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(12, 16, 34, 0.7);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  color: #7bd3ff;
-  font-size: 16px;
-  font-weight: 600;
-  z-index: 10;
 }
 </style>

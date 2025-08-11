@@ -136,6 +136,7 @@ const updatedAt = computed(() => {
   background: rgba(0, 0, 0, 0.35);
   border-color: rgba(255, 255, 255, 0.2);
   transform: translateX(4px);
+  cursor: pointer;
 }
 
 .message-header {
