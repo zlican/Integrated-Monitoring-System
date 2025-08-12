@@ -57,8 +57,8 @@ const updatedAt = computed(() => {
   flex-direction: column;
   gap: 12px;
   list-style: none;
-  margin: 0;
-  padding: 0;
+  margin: 2px;
+  padding: 2px;
 
   /* 固定高度为5个li的高度 */
   max-height: calc((108px + 12px) * 5); /* 60px是li的高度，12px是gap */
@@ -68,7 +68,7 @@ const updatedAt = computed(() => {
 
 /* 滚动条美化（可选） */
 .messages-list::-webkit-scrollbar {
-  width: 6px;
+  width: 3px;
 }
 .messages-list::-webkit-scrollbar-thumb {
   background: rgba(160, 196, 255, 0.5);

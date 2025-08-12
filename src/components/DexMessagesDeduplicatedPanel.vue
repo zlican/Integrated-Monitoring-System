@@ -1,6 +1,6 @@
 <template>
   <CardFrame :updatedAt="updatedAt">
-    <template #title>DEX消息（最近1小时去重）</template>
+    <template #title>DEX消息（最近半小时去重）</template>
     <div class="messages-container">
       <ul v-if="displayedMessages.length" class="messages-list">
       <li v-for="message in deduplicatedMessages" 

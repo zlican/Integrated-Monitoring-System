@@ -1,6 +1,6 @@
 <template>
   <CardFrame :updatedAt="updatedAt">
-    <template #title>CEX等待区</template>
+    <template #title>CEX监控区</template>
     <div v-if="error" class="error">{{ error }}</div>
     <ul v-if="messages && messages.length" class="messages-list">
       <li

@@ -41,15 +41,15 @@ export const useTradesStore = defineStore('trades', {
     latestCex3: (state) => [...state.cex].sort((a, b) => b.ts - a.ts).slice(0, 3),
     latestDex3: (state) => [...state.dex].sort((a, b) => b.ts - a.ts).slice(0, 3),
     
-    // 获取最近1小时的去重DEX消息
+    // 获取最近半小时的去重DEX消息
     recentDexMessagesDeduplicated: (state) => {
       if (!state.dexMessages?.messages) return [];
       
-      const oneHourAgo = Date.now() - 60 * 60 * 1000; // 1小时前
+      const halfHourAgo = Date.now() - 30 * 60 * 1000; // 30分钟前
       
-      // 过滤最近1小时的消息
+      // 过滤最近半小时的消息
       const recentMessages = state.dexMessages.messages.filter(msg => 
-        new Date(msg.timestamp).getTime() > oneHourAgo
+        new Date(msg.timestamp).getTime() > halfHourAgo
       );
       
       // 按时间倒序排序
