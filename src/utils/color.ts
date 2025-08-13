@@ -1,15 +1,10 @@
 // 获取趋势状态对应的颜色
 export const getTrendColor = (state: string): string => {
   switch (state) {
-    case 'golden':
-    case 'goldengt':
-    case 'bull':
+    case 'buymacd':
       return '#ffc107'; //  金叉/多
-    case 'dead':
-    case 'deadlt':
-    case 'bear':
+    case 'sellmacd':
       return '#9c27b0'; // 死叉/空
-    case 'flat':
     default:
       return '#9e9e9e'; // 随机漫步
   }
@@ -18,20 +13,12 @@ export const getTrendColor = (state: string): string => {
 // 获取趋势状态的中文描述
 export const getTrendLabel = (state: string): string => {
   switch (state) {
-    case 'golden':
-      return '金叉';
-    case 'goldengt':
-      return '金叉之上';
-    case 'dead':
-      return '死叉';
-    case 'deadlt':
-      return '死叉之下';
-    case 'bull':
+    case 'buymacd':
       return '做多';
-    case 'bear':
+    case 'sellmacd':
       return '做空';
     case 'flat':
-      return '随机漫步';
+      return '随机';
     default:
       return '—';
   }

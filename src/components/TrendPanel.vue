@@ -78,12 +78,8 @@ const formatFrameLabel = (frame: string) => {
 
 const getTrendClass = (trend: string) => {
   return {
-    'trend-bull': trend === 'bull',
-    'trend-bear': trend === 'bear',
-    'trend-golden': trend === 'golden',
-    'trend-dead': trend === 'dead',
-    'trend-goldengt': trend === 'goldengt',
-    'trend-deadlt': trend === 'deadlt',
+    'trend-buymacd': trend === 'buymacd',
+    'trend-sellmacd': trend === 'sellmacd',
     'trend-flat': trend === 'flat'
   };
 };
@@ -114,12 +110,8 @@ usePolling(() => {
 <style scoped>
 .trend-container {
   --color-primary: #00f6ff;
-  --color-bull: #ffc107;
-  --color-bear: #9c27b0;
-  --color-golden: #ffc107;
-  --color-dead: #9c27b0;
-  --color-goldengt: #ffc107;
-  --color-deadlt: #9c27b0;
+  --color-buymacd: #ffc107;
+  --color-sellmacd: #9c27b0;
   --color-flat: #9e9e9e;
 
   --bg-card: #0d1b36;
@@ -227,72 +219,26 @@ usePolling(() => {
 }
 
 /* 状态颜色 */
-.trend-bull {
+.trend-buymacd {
   background: rgba(255, 193, 7, 0.2);
   border-color: rgba(255, 193, 7, 0.6);
   color: #fff399;
   text-shadow: 0 0 10px #ffc107;
 }
-.trend-bull::before {
-  background: var(--color-golden);
-  box-shadow: 0 0 12px var(--color-golden);
+.trend-buymacd::before {
+  background: var(--color-buymacd);
+  box-shadow: 0 0 12px var(--color-buymacd);
 }
 
-.trend-bear {
+.trend-sellmacd {
   background: rgba(156, 39, 176, 0.2);
   border-color: rgba(156, 39, 176, 0.6);
   color: #d6a1f9;
   text-shadow: 0 0 10px #9c27b0;
 }
-.trend-bear::before {
-  background: var(--color-dead);
-  box-shadow: 0 0 12px var(--color-dead);
-}
-
-.trend-golden {
-  background: rgba(255, 193, 7, 0.2);
-  border-color: rgba(255, 193, 7, 0.6);
-  color: #fff399;
-  text-shadow: 0 0 10px #ffc107;
-}
-.trend-golden::before {
-  background: var(--color-golden);
-  box-shadow: 0 0 12px var(--color-golden);
-}
-
-.trend-goldengt {
-  background: rgba(255, 193, 7, 0.2);
-  border-color: rgba(255, 193, 7, 0.6);
-  color: #fff399;
-  text-shadow: 0 0 10px #ffc107;
-}
-
-.trend-goldengt::before {
-  background: var(--color-goldengt);
-  box-shadow: 0 0 12px var(--color-goldengt);
-}
-
-
-.trend-dead {
-  background: rgba(156, 39, 176, 0.2);
-  border-color: rgba(156, 39, 176, 0.6);
-  color: #d6a1f9;
-  text-shadow: 0 0 10px #9c27b0;
-}
-.trend-dead::before {
-  background: var(--color-dead);
-  box-shadow: 0 0 12px var(--color-dead);
-}
-
-.trend-deadlt {
-  background: rgba(156, 39, 176, 0.2);
-  border-color: rgba(156, 39, 176, 0.6);
-  color: #d6a1f9;
-  text-shadow: 0 0 10px #9c27b0;
-}
-.trend-deadlt::before {
-  background: var(--color-deadlt);
-  box-shadow: 0 0 12px var(--color-deadlt);
+.trend-sellmacd::before {
+  background: var(--color-sellmacd);
+  box-shadow: 0 0 12px var(--color-sellmacd);
 }
 
 .trend-flat {

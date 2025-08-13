@@ -4,37 +4,19 @@ import { PriceApiService, TrendApiService } from '@/services/api';
 
 // 趋势状态映射函数
 const mapTrendState = (apiState: TrendApiState, interval: string): string => {
-  if (interval === '1h' || interval === '3d') {
-    switch (apiState) {
-      case 'UP': return 'bull';
-      case 'DOWN': return 'bear';
-      case 'RANGE': return 'flat';
-      default: return 'flat';
-    }
-  } else if (interval === '15m' || interval === '1d') {
-    switch (apiState) {
-      case 'UPEMAGT': return 'goldengt';
-      case 'DOWNEMALT': return 'deadlt';
-      default: return 'flat';
-    }
-  } else {
-    switch (apiState) {
-      case 'UPEMA': return 'golden';
-      case 'DOWNEMA': return 'dead';
-      default: return 'flat';
-    }
+  switch (apiState) {
+    case 'BUYMACD': return 'buymacd';    // 金叉
+    case 'SELLMACD': return 'sellmacd';    // 死叉
+    case 'RANGE': return 'flat';      // 随机漫步
+    default: return 'flat';
   }
 };
 
 // 新增：长线趋势状态映射函数
 const mapLongTermTrendState = (apiState: TrendApiState): string => {
   switch (apiState) {
-    case 'UPEMA': return 'golden';    // 金叉
-    case 'UPEMAGT': return 'goldengt'; //金叉之上
-    case 'DOWNEMA': return 'dead';    // 死叉
-    case 'DOWNEMALT': return 'deadlt'; //死叉之下
-    case 'UP': return 'bull';         // 多头
-    case 'DOWN': return 'bear';       // 空头
+    case 'BUYMACD': return 'buymacd';    // 金叉
+    case 'SELLMACD': return 'sellmacd';    // 死叉
     case 'RANGE': return 'flat';      // 随机漫步
     default: return 'flat';
   }

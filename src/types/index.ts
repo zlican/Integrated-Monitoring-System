@@ -1,8 +1,8 @@
 // 趋势状态类型
-export type TrendState = 'golden' | 'goldengt' | 'dead' | 'deadlt' | 'bull' | 'bear' | 'flat';
+export type TrendState = 'buymacd' | 'sellmacd' | 'flat';
 
 // 新增：趋势分析API返回的原始状态类型
-export type TrendApiState = 'UP' | 'DOWN' | 'RANGE' | 'UPEMA' | 'DOWNEMA' | 'UPEMAGT' | 'DOWNEMALT' | 'unknown';
+export type TrendApiState = 'BUYMACD' | 'SELLMACD' | 'RANGE' | 'unknown';
 
 // 趋势分析响应类型
 export interface TrendAnalysisResp {
