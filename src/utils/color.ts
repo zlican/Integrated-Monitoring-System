@@ -15,8 +15,12 @@ export const getTrendLabel = (state: string): string => {
   switch (state) {
     case 'buymacd':
       return '做多';
+      case 'up':
+        return '做多';
     case 'sellmacd':
       return '做空';
+      case 'down':
+        return '做空';
     case 'flat':
       return '随机';
     default:

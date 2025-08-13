@@ -80,6 +80,8 @@ const getTrendClass = (trend: string) => {
   return {
     'trend-buymacd': trend === 'buymacd',
     'trend-sellmacd': trend === 'sellmacd',
+    'trend-up': trend === 'up',
+    'trend-down': trend === 'down',
     'trend-flat': trend === 'flat'
   };
 };
@@ -112,6 +114,8 @@ usePolling(() => {
   --color-primary: #00f6ff;
   --color-buymacd: #ffc107;
   --color-sellmacd: #9c27b0;
+  --color-up:#ffc107;
+  --color-down:#9c27b0;
   --color-flat: #9e9e9e;
 
   --bg-card: #0d1b36;
@@ -239,6 +243,28 @@ usePolling(() => {
 .trend-sellmacd::before {
   background: var(--color-sellmacd);
   box-shadow: 0 0 12px var(--color-sellmacd);
+}
+
+.trend-up {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.6);
+  color: #fff399;
+  text-shadow: 0 0 10px #ffc107;
+}
+.trend-up::before {
+  background: var(--color-up);
+  box-shadow: 0 0 12px var(--color-up);
+}
+
+.trend-down {
+  background: rgba(156, 39, 176, 0.2);
+  border-color: rgba(156, 39, 176, 0.6);
+  color: #d6a1f9;
+  text-shadow: 0 0 10px #9c27b0;
+}
+.trend-down::before {
+  background: var(--color-down);
+  box-shadow: 0 0 12px var(--color-down);
 }
 
 .trend-flat {

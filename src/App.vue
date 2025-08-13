@@ -27,18 +27,18 @@
         :loading="trades.loading.cexMessages"
         :error="trades.error.cexMessages"
       />
-
+      <DexMessagesDeduplicatedPanel 
+        :messages="displayedDexMessages"
+        :loading="trades.loading.dexMessages"
+        :error="trades.error.dexMessages"
+      />
       <DexMessagesPanel 
         :messages="displayedDexMessages"
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />
 
-      <DexMessagesDeduplicatedPanel 
-        :messages="displayedDexMessages"
-        :loading="trades.loading.dexMessages"
-        :error="trades.error.dexMessages"
-      />
+
       <CexMessagesWaitingPanel
         :messages="trades.cexWaitingMessages?.messages || []"
         :loading="trades.loading.cexWaiting"

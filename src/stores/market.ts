@@ -6,7 +6,9 @@ import { PriceApiService, TrendApiService } from '@/services/api';
 const mapTrendState = (apiState: TrendApiState, interval: string): string => {
   switch (apiState) {
     case 'BUYMACD': return 'buymacd';    // 金叉
+    case 'UP': return 'up';
     case 'SELLMACD': return 'sellmacd';    // 死叉
+    case 'DOWN': return 'down'
     case 'RANGE': return 'flat';      // 随机漫步
     default: return 'flat';
   }
@@ -16,7 +18,9 @@ const mapTrendState = (apiState: TrendApiState, interval: string): string => {
 const mapLongTermTrendState = (apiState: TrendApiState): string => {
   switch (apiState) {
     case 'BUYMACD': return 'buymacd';    // 金叉
+    case 'UP': return 'up';
     case 'SELLMACD': return 'sellmacd';    // 死叉
+    case 'DOWN': return 'down'
     case 'RANGE': return 'flat';      // 随机漫步
     default: return 'flat';
   }
