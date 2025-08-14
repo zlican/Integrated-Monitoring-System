@@ -63,7 +63,7 @@ const handleClick = (text: string) => {
     return;
   }
   const address = match[0];
-  const url = `https://web3.okx.com/zh-hans/token/solana/${address}`;
+  const url = `https://gmgn.ai/sol/token/${address}`;
 
   // 新开一个带参数的新浏览器窗口（非tab）
   window.open(url, '_blank');

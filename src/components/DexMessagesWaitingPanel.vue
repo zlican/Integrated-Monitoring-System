@@ -45,7 +45,7 @@ const handleClick = (text: string) => {
     return;
   }
   const address = match[0];
-  const url = `https://web3.okx.com/zh-hans/token/solana/${address}`;
+  const url = `https://gmgn.ai/sol/token/${address}`;
   window.open(url, '_blank');
 };
 </script>

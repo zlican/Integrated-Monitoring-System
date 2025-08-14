@@ -268,15 +268,32 @@ usePolling(() => {
 }
 
 .trend-flat {
-  background: rgba(158, 158, 158, 0.2);
-  border-color: rgba(158, 158, 158, 0.6);
-  color: #dedede;
-  text-shadow: 0 0 10px #9e9e9e;
+  background: linear-gradient(90deg, 
+    rgba(255, 107, 107, 0.2),  /* 柔红 */
+    rgba(255, 159, 28, 0.2),   /* 柔橙 */
+    rgba(255, 217, 61, 0.2),   /* 柔黄 */
+    rgba(29, 211, 176, 0.2),   /* 柔绿 */
+    rgba(0, 180, 216, 0.5),    /* 柔蓝 */
+    rgba(162, 155, 254, 0.2)   /* 柔紫 */
+  );
+  background-size: 400% 400%;
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  animation: rainbowMove 6s ease infinite; /* 让渐变流动 */
 }
+
 .trend-flat::before {
-  background: var(--color-flat);
-  box-shadow: 0 0 12px var(--color-flat);
+  background: #fff;
+  box-shadow: 0 0 12px #fff;
 }
+
+@keyframes rainbowMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
 /* 加载、错误、无数据提示 */
 .loading, .error, .no-data {

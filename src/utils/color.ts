@@ -22,7 +22,7 @@ export const getTrendLabel = (state: string): string => {
       case 'down':
         return '做空';
     case 'flat':
-      return '随机';
+      return '跟随';
     default:
       return '—';
   }
