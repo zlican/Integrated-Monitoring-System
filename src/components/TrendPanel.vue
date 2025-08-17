@@ -92,27 +92,24 @@ const getIrrationalMoment = (framesData: Record<string, string>) => {
     const mid = framesData['15m']
     const large = framesData['1h']
 
-    if (large === 'buymacd' && mid != 'sellmacd' && small != 'sellmacd') return '开多'
-    if (large === 'sellmacd' && mid != 'buymacd' && small != 'buymacd') return '开空'
-    if (large != 'sellmacd' && mid != 'sellmacd' && small != 'sellmacd') return '偏多'
-    if (large != 'buymacd' && mid != 'buymacd' && small != 'buymacd') return '偏空'
+    if (large === 'buymacd' && mid != 'sellmacd' && small === 'buymacd') return '开多'
+    if (large === 'sellmacd' && mid != 'buymacd' && small === 'sellmacd') return '开空'
+    return '不管'
   } else {
     const small = framesData['4h']
     const mid = framesData['1d']
     const large = framesData['3d']
 
-    if (large === 'buymacd' && mid != 'sellmacd' && small != 'sellmacd') return '开多'
-    if (large === 'sellmacd' && mid != 'buymacd' && small != 'buymacd') return '开空'
-    if (large != 'sellmacd' && mid != 'sellmacd' && small != 'sellmacd') return '偏多'
-    if (large != 'buymacd' && mid != 'buymacd' && small != 'buymacd') return '偏空'
+    if (large === 'buymacd' && mid != 'sellmacd' && small === 'buymacd') return '开多'
+    if (large === 'sellmacd' && mid != 'buymacd' && small === 'sellmacd') return '开空'
+    return '不管'
   }
 }
 const getIrrationalClass = (status: string) => {
   return {
     'irrational-entry-long': status === '开多',
     'irrational-entry-sell': status === '开空',
-    'irrational-wait-long': status === '偏多',
-    'irrational-wait-sell': status === '偏空',
+    'none': status ==='不管'
   }
 }
 
@@ -391,38 +388,30 @@ usePolling(() => {
 
 .irrational-entry-long  {
   color: #2fe68d; 
-  text-shadow: 0 0 4px #2fe68d;
+  text-shadow: 0 0 8px #2fe68d;
 }
 .irrational-entry-long::before {
   background: #00E676;
-  box-shadow: 0 0 8px #00E676;
+  box-shadow: 0 0 12cqb #00E676;
 }
 
 .irrational-entry-sell  {
   color: #2fe68d; 
-  text-shadow: 0 0 4px #2fe68d;
+  text-shadow: 0 0 8px #2fe68d;
 }
 .irrational-entry-sell::before {
   background: #00E676;
-  box-shadow: 0 0 8px #00E676;
+  box-shadow: 0 0 12px #00E676;
 }
 
-.irrational-wait-long {
-  color: #90cff5;
-  text-shadow: 0 0 4px #90cff5;
+.none {
+  color: #aeb0b2;
+  text-shadow: 0 0 4px #aeb0b2;
 }
-.irrational-wait-long::before {
-  background: #1f93eb;
-  box-shadow: 0 0 6px #1f93eb;
+.none::before {
+  background: #8b8e90;
+  box-shadow: 0 0 6px #8b8e90;
 }
 
-.irrational-wait-sell {
-  color: #90cff5; 
-  text-shadow: 0 0 4px #90cff5;
-}
-.irrational-wait-sell::before {
-  background: #1f93eb;
-  box-shadow: 0 0 6px #1f93eb;
-}
 
 </style>
