@@ -10,18 +10,28 @@
     <div class="trend-container">
     <div v-if="data?.symbols" class="trend-content">
       <div v-for="item in data.symbols" :key="item.base" class="symbol-row">
-        <span class="symbol-name">{{ item.base }}:</span>
-        <div class="trend-frames">
-          <span 
-            v-for="frame in frames" 
-            :key="frame" 
-            class="trend-frame"
-            :class="getTrendClass(item.frames[frame])"
-          >
-            {{ formatFrameLabel(frame) }}({{ getTrendLabel(item.frames[frame]) }})
-          </span>
-        </div>
-      </div>
+  <span class="symbol-name">{{ item.base }}:</span>
+  <div class="trend-frames">
+    <span 
+      v-for="frame in frames" 
+      :key="frame" 
+      class="trend-frame"
+      :class="getTrendClass(item.frames[frame])"
+    >
+      {{ formatFrameLabel(frame) }}({{ getTrendLabel(item.frames[frame]) }})
+    </span>
+  </div>
+
+  <!-- 独立显示非理性时刻 -->
+  <div 
+    v-if="getIrrationalMoment(item.frames)" 
+    class="irrational-moment trend-frame"
+    
+  :class="getIrrationalClass(getIrrationalMoment(item.frames))"
+  >
+    {{ getIrrationalMoment(item.frames) }}
+  </div>
+</div>
     </div>
     <div v-else class="no-data">暂无数据</div>
   </div>
@@ -75,6 +85,36 @@ const formatFrameLabel = (frame: string) => {
   }
   return frame.toUpperCase().replace('M', 'M').replace('H', 'H');
 };
+
+const getIrrationalMoment = (framesData: Record<string, string>) => {
+  if (props.kind === 'A') {
+    const small = framesData['5m']
+    const mid = framesData['15m']
+    const large = framesData['1h']
+
+    if (large === 'buymacd' && mid != 'sellmacd' && small != 'sellmacd') return '开多'
+    if (large === 'sellmacd' && mid != 'buymacd' && small != 'buymacd') return '开空'
+    if (large != 'sellmacd' && mid != 'sellmacd' && small != 'sellmacd') return '偏多'
+    if (large != 'buymacd' && mid != 'buymacd' && small != 'buymacd') return '偏空'
+  } else {
+    const small = framesData['4h']
+    const mid = framesData['1d']
+    const large = framesData['3d']
+
+    if (large === 'buymacd' && mid != 'sellmacd' && small != 'sellmacd') return '开多'
+    if (large === 'sellmacd' && mid != 'buymacd' && small != 'buymacd') return '开空'
+    if (large != 'sellmacd' && mid != 'sellmacd' && small != 'sellmacd') return '偏多'
+    if (large != 'buymacd' && mid != 'buymacd' && small != 'buymacd') return '偏空'
+  }
+}
+const getIrrationalClass = (status: string) => {
+  return {
+    'irrational-entry-long': status === '开多',
+    'irrational-entry-sell': status === '开空',
+    'irrational-wait-long': status === '偏多',
+    'irrational-wait-sell': status === '偏空',
+  }
+}
 
 const getTrendClass = (trend: string) => {
   return {
@@ -321,4 +361,68 @@ usePolling(() => {
     font-size: 14px;
   }
 }
+.irrational-moment {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: var(--chip-radius);
+  background: rgba(13, 27, 54, 0.6);
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-primary);
+  text-shadow: 0 0 6px rgba(0, 246, 255, 0.6);
+  position: relative;
+}
+
+/* 小圆点通用样式 */
+.irrational-moment::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
+  margin-right: 6px;
+}
+
+.irrational-entry-long  {
+  color: #2fe68d; 
+  text-shadow: 0 0 4px #2fe68d;
+}
+.irrational-entry-long::before {
+  background: #00E676;
+  box-shadow: 0 0 8px #00E676;
+}
+
+.irrational-entry-sell  {
+  color: #2fe68d; 
+  text-shadow: 0 0 4px #2fe68d;
+}
+.irrational-entry-sell::before {
+  background: #00E676;
+  box-shadow: 0 0 8px #00E676;
+}
+
+.irrational-wait-long {
+  color: #90cff5;
+  text-shadow: 0 0 4px #90cff5;
+}
+.irrational-wait-long::before {
+  background: #1f93eb;
+  box-shadow: 0 0 6px #1f93eb;
+}
+
+.irrational-wait-sell {
+  color: #90cff5; 
+  text-shadow: 0 0 4px #90cff5;
+}
+.irrational-wait-sell::before {
+  background: #1f93eb;
+  box-shadow: 0 0 6px #1f93eb;
+}
+
 </style>

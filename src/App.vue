@@ -17,8 +17,8 @@
 
     <div class="grid top">
       <PriceCard />
-      <TrendPanel kind="A" title="趋势分析（短线）" />
-      <TrendPanel kind="C" title="趋势分析（长线）" />
+      <TrendPanel kind="A" title="趋势分析（短线）： 1H是连接短线与长线的核心（只做短线）" />
+      <TrendPanel kind="C" title="趋势分析（长线）： 1H趋势走出来是必要条件（否则不看）" />
     </div>
 
     <div class="grid bottom">
