@@ -92,23 +92,24 @@ const getIrrationalMoment = (framesData: Record<string, string>) => {
     const mid = framesData['15m']
     const large = framesData['1h']
 
-    if (large === 'buymacd' && mid != 'sellmacd' && small === 'buymacd') return '开多'
-    if (large === 'sellmacd' && mid != 'buymacd' && small === 'sellmacd') return '开空'
+    if (large === "buymacd" && mid != "sellmacd" && small != "sellmacd") return '方向'
+    if (large === "sellmacd" &&  mid != "buymacd" && small != "buymacd" ) return '方向'
+    if (large === 'flat') return '奇点'
     return '不管'
   } else {
     const small = framesData['4h']
     const mid = framesData['1d']
     const large = framesData['3d']
-
-    if (large === 'buymacd' && mid != 'sellmacd' && small === 'buymacd') return '开多'
-    if (large === 'sellmacd' && mid != 'buymacd' && small === 'sellmacd') return '开空'
+    if (large === "buymacd" && mid != "sellmacd" && small != "sellmacd") return '方向'
+    if (large === "sellmacd" &&  mid != "buymacd" && small != "buymacd" ) return '方向'
+    if (large === 'flat') return '奇点'
     return '不管'
   }
 }
 const getIrrationalClass = (status: string) => {
   return {
-    'irrational-entry-long': status === '开多',
-    'irrational-entry-sell': status === '开空',
+    'irrational-entry': status === '方向',
+    'important-point': status === '奇点',
     'none': status ==='不管'
   }
 }
@@ -386,22 +387,24 @@ usePolling(() => {
   margin-right: 6px;
 }
 
-.irrational-entry-long  {
+.irrational-entry  {
   color: #2fe68d; 
   text-shadow: 0 0 8px #2fe68d;
 }
-.irrational-entry-long::before {
+.irrational-entry::before {
   background: #00E676;
   box-shadow: 0 0 12cqb #00E676;
 }
 
-.irrational-entry-sell  {
-  color: #2fe68d; 
-  text-shadow: 0 0 8px #2fe68d;
+
+
+.important-point {
+  color: #efc51b;
+  text-shadow: 0 0 4px #efc51b;
 }
-.irrational-entry-sell::before {
-  background: #00E676;
-  box-shadow: 0 0 12px #00E676;
+.important-point::before {
+  background: #e9fa03;
+  box-shadow: 0 0 6px #e9fa03;
 }
 
 .none {
