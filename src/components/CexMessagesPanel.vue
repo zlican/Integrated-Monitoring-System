@@ -148,7 +148,7 @@ const updatedAt = computed(() => {
 .message-time {
   opacity: 0.8;
   font-variant-numeric: tabular-nums;
-  font-size: 18px;
+  font-size: 20px;
   color: #a0c4ff;
 }
 
@@ -160,7 +160,7 @@ const updatedAt = computed(() => {
   margin: 0;
   white-space: pre-wrap;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.4;
   color: #ffffff;
   background: transparent;
@@ -202,7 +202,7 @@ const updatedAt = computed(() => {
 }
 
 .error-icon {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .no-data {

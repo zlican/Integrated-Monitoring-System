@@ -97,7 +97,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
   --shadow-glow: rgba(0, 246, 255, 0.3);
 
   font-family: "Inter", system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 20px;
   color: var(--color-primary);
   user-select: none;
 }
@@ -107,7 +107,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
-  font-size: 18px;
+  font-size: 20px;
   letter-spacing: 0.06em;
   color: var(--color-primary);
 }
@@ -119,7 +119,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
   position: absolute;
   right: 28px;
   top: 18px;
-  font-size: 13px;
+  font-size: 20px;
   color: #5599bb;
   letter-spacing: 0.02em;
   user-select: none;
@@ -234,7 +234,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
 .error-message {
   color: var(--color-negative);
   font-weight: 700;
-  font-size: 17px;
+  font-size: 20px;
   margin-bottom: 16px;
   text-shadow: 0 0 8px var(--color-negative);
 }

@@ -92,24 +92,28 @@ const getIrrationalMoment = (framesData: Record<string, string>) => {
     const mid = framesData['15m']
     const large = framesData['1h']
 
-    if (large === "buymacd" && mid != "sellmacd" && small != "sellmacd") return '方向'
-    if (large === "sellmacd" &&  mid != "buymacd" && small != "buymacd" ) return '方向'
-    if (large === 'flat') return '奇点'
+    if (large != "sellmacd" && mid === "buymacd" && small != "sellmacd") return '中多'
+    if (large != "buymacd" && mid === "sellmacd" && small != "buymacd") return '中空'
+    if (large != "sellmacd" && mid != "sellmacd" && small === "buymacd") return '小多'
+    if (large != "buymacd" && mid != "buymacd" && small === "sellmacd") return '小空'
     return '不管'
   } else {
     const small = framesData['4h']
     const mid = framesData['1d']
     const large = framesData['3d']
-    if (large === "buymacd" && mid != "sellmacd" && small != "sellmacd") return '方向'
-    if (large === "sellmacd" &&  mid != "buymacd" && small != "buymacd" ) return '方向'
-    if (large === 'flat') return '奇点'
+    if (large != "sellmacd" && mid === "buymacd" && small != "sellmacd") return '中多'
+    if (large != "buymacd" && mid === "sellmacd" && small != "buymacd") return '中空'
+    if (large != "sellmacd" && mid != "sellmacd" && small === "buymacd") return '小多'
+    if (large != "buymacd" && mid != "buymacd" && small === "sellmacd") return '小空'
     return '不管'
   }
 }
 const getIrrationalClass = (status: string) => {
   return {
-    'irrational-entry': status === '方向',
-    'important-point': status === '奇点',
+    'mid-entry-long': status === '中多',
+    'mid-entry-short': status === '中空',
+    'small-entry-long': status === '小多',
+    'small-entry-short': status === '小空',
     'none': status ==='不管'
   }
 }
@@ -164,7 +168,7 @@ usePolling(() => {
   --chip-radius: 999px;
 
   font-family: "Inter", system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 20px;
   color: var(--color-primary);
   user-select: none;
 }
@@ -179,7 +183,7 @@ usePolling(() => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
-  font-size: 18px;
+  font-size: 20px;
   letter-spacing: 0.06em;
   color: var(--color-primary);
 }
@@ -232,7 +236,7 @@ usePolling(() => {
   border-radius: var(--chip-radius);
   border: 1px solid rgba(0, 246, 255, 0.3);
   min-width: 72px;
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 400;
   white-space: nowrap;
   color: rgba(255, 255, 255, 0.95);
@@ -338,7 +342,7 @@ usePolling(() => {
   text-align: center;
   color: var(--color-primary);
   padding: 20px;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   opacity: 0.9;
 }
@@ -356,7 +360,7 @@ usePolling(() => {
   .trend-frame {
     min-width: auto;
     padding: 8px 14px;
-    font-size: 14px;
+    font-size: 20px;
   }
 }
 .irrational-moment {
@@ -369,7 +373,7 @@ usePolling(() => {
   border-radius: var(--chip-radius);
   background: rgba(13, 27, 54, 0.6);
   border: 1px solid rgba(0, 246, 255, 0.3);
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 500;
   color: var(--color-primary);
   text-shadow: 0 0 6px rgba(0, 246, 255, 0.6);
@@ -387,24 +391,39 @@ usePolling(() => {
   margin-right: 6px;
 }
 
-.irrational-entry  {
+.mid-entry-long  {
   color: #2fe68d; 
   text-shadow: 0 0 8px #2fe68d;
 }
-.irrational-entry::before {
+.mid-entry-long::before {
+  background: #00E676;
+  box-shadow: 0 0 12cqb #00E676;
+}
+.big-entry-short  {
+  color: #2fe68d; 
+  text-shadow: 0 0 8px #2fe68d;
+}
+.big-short::before {
   background: #00E676;
   box-shadow: 0 0 12cqb #00E676;
 }
 
-
-
-.important-point {
-  color: #efc51b;
-  text-shadow: 0 0 4px #efc51b;
+.small-entry-long {
+  color: #a6a1e9;
+  text-shadow: 0 0 2px #a6a1e9;
 }
-.important-point::before {
-  background: #e9fa03;
-  box-shadow: 0 0 6px #e9fa03;
+.small-entry-long::before {
+  background: #7d88e6;
+  box-shadow: 0 0 3px #7d88e6;
+}
+
+.small-entry-short {
+  color: #a6a1e9;
+  text-shadow: 0 0 2px #a6a1e9;
+}
+.small-entry-short::before {
+  background: #7d88e6;
+  box-shadow: 0 0 3px #7d88e6;
 }
 
 .none {

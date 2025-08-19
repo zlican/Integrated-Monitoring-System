@@ -174,7 +174,7 @@ const highlightAddresses = (text: string) => {
 .message-time {
   opacity: 0.8;
   font-variant-numeric: tabular-nums;
-  font-size: 18px;
+  font-size: 20px;
   color: #a0c4ff;
 }
 
@@ -186,7 +186,7 @@ const highlightAddresses = (text: string) => {
   margin: 0;
   white-space: pre-wrap;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.4;
   color: #ffffff;
   background: transparent;
@@ -237,7 +237,7 @@ const highlightAddresses = (text: string) => {
 }
 
 .error-icon {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .no-data {
@@ -274,7 +274,7 @@ const highlightAddresses = (text: string) => {
   align-items: center;
   color: #a0c4ff;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 20px;
   z-index: 10;
   pointer-events: none;
 }
