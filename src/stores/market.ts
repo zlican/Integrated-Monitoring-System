@@ -9,7 +9,8 @@ const mapTrendState = (apiState: TrendApiState, interval: string): string => {
     case 'UP': return 'up';
     case 'SELLMACD': return 'sellmacd';    // 死叉
     case 'DOWN': return 'down'
-    case 'RANGE': return 'flat';      // 随机漫步
+    case 'UPRANGE': return 'uprange';
+    case 'DOWNRANGE': return 'downrange';      
     default: return 'flat';
   }
 };
@@ -21,7 +22,8 @@ const mapLongTermTrendState = (apiState: TrendApiState): string => {
     case 'UP': return 'up';
     case 'SELLMACD': return 'sellmacd';    // 死叉
     case 'DOWN': return 'down'
-    case 'RANGE': return 'flat';      // 随机漫步
+    case 'UPRANGE': return 'uprange';
+    case 'DOWNRANGE': return 'downrange';   
     default: return 'flat';
   }
 };

@@ -92,29 +92,29 @@ const getIrrationalMoment = (framesData: Record<string, string>) => {
     const mid = framesData['15m']
     const large = framesData['1h']
 
-    if (large != "sellmacd" && mid === "buymacd" && small != "sellmacd") return '中多'
-    if (large != "buymacd" && mid === "sellmacd" && small != "buymacd") return '中空'
-    if (large != "sellmacd" && mid != "sellmacd" && small === "buymacd") return '小多'
-    if (large != "buymacd" && mid != "buymacd" && small === "sellmacd") return '小空'
-    return '不管'
+    if ((large == "buymacd") && (mid === "buymacd" || mid === "uprange") && (small == "buymacd" || small == "uprange")) return '趋势多' 
+    if ((large == "sellmacd") && (mid === "sellmacd" || mid === "downrange") && (small == "sellmacd" || small == "downrange")) return '趋势空' 
+    if (large == "uprange" && mid == "uprange" && (small == "sellmacd" || small == "downrange")) return "反转空"  
+    if (large == "downrange" && mid == "downrange" && (small == "buymacd" || small == "uprange")) return "反转多" 
+    return '震荡'
   } else {
     const small = framesData['4h']
     const mid = framesData['1d']
     const large = framesData['3d']
-    if (large != "sellmacd" && mid === "buymacd" && small != "sellmacd") return '中多'
-    if (large != "buymacd" && mid === "sellmacd" && small != "buymacd") return '中空'
-    if (large != "sellmacd" && mid != "sellmacd" && small === "buymacd") return '小多'
-    if (large != "buymacd" && mid != "buymacd" && small === "sellmacd") return '小空'
-    return '不管'
+    if ((large == "buymacd") && (mid === "buymacd" || mid === "uprange") && (small == "buymacd" || small == "uprange")) return '趋势多' 
+    if ((large == "sellmacd") && (mid === "sellmacd" || mid === "downrange") && (small == "sellmacd" || small == "downrange")) return '趋势空' 
+    if (large == "uprange" && mid == "uprange" && (small == "sellmacd" || small == "downrange")) return "反转空"  
+    if (large == "downrange" && mid == "downrange" && (small == "buymacd" || small == "uprange")) return "反转多" 
+    return '震荡'
   }
 }
 const getIrrationalClass = (status: string) => {
   return {
-    'mid-entry-long': status === '中多',
-    'mid-entry-short': status === '中空',
-    'small-entry-long': status === '小多',
-    'small-entry-short': status === '小空',
-    'none': status ==='不管'
+    'trend-entry-long': status === '趋势多',
+    'trend-entry-short': status === '趋势空',
+    'reverse-entry-long': status === '反转多',
+    'reverse-entry-short': status === '反转空',
+    'none': status ==='震荡'
   }
 }
 
@@ -124,7 +124,8 @@ const getTrendClass = (trend: string) => {
     'trend-sellmacd': trend === 'sellmacd',
     'trend-up': trend === 'up',
     'trend-down': trend === 'down',
-    'trend-flat': trend === 'flat'
+    'trend-uprange': trend === 'uprange',
+    'trend-downrange': trend === 'downrange',
   };
 };
 
@@ -309,7 +310,7 @@ usePolling(() => {
   box-shadow: 0 0 12px var(--color-down);
 }
 
-.trend-flat {
+.trend-uprange {
   background: linear-gradient(90deg, 
     rgba(255, 107, 107, 0.2),  /* 柔红 */
     rgba(255, 159, 28, 0.2),   /* 柔橙 */
@@ -325,10 +326,31 @@ usePolling(() => {
   animation: rainbowMove 6s ease infinite; /* 让渐变流动 */
 }
 
-.trend-flat::before {
+.trend-uprange::before {
   background: #fff;
   box-shadow: 0 0 12px #fff;
 }
+.trend-downrange {
+  background: linear-gradient(90deg, 
+    rgba(255, 107, 107, 0.2),  /* 柔红 */
+    rgba(255, 159, 28, 0.2),   /* 柔橙 */
+    rgba(255, 217, 61, 0.2),   /* 柔黄 */
+    rgba(29, 211, 176, 0.2),   /* 柔绿 */
+    rgba(0, 180, 216, 0.5),    /* 柔蓝 */
+    rgba(162, 155, 254, 0.2)   /* 柔紫 */
+  );
+  background-size: 400% 400%;
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  animation: rainbowMove 6s ease infinite; /* 让渐变流动 */
+}
+
+.trend-downrange::before {
+  background: #fff;
+  box-shadow: 0 0 12px #fff;
+}
+
 
 @keyframes rainbowMove {
   0% { background-position: 0% 50%; }
@@ -391,37 +413,37 @@ usePolling(() => {
   margin-right: 6px;
 }
 
-.mid-entry-long  {
+.trend-entry-long  {
   color: #2fe68d; 
   text-shadow: 0 0 8px #2fe68d;
 }
-.mid-entry-long::before {
+.trend-entry-long::before {
   background: #00E676;
   box-shadow: 0 0 12cqb #00E676;
 }
-.big-entry-short  {
+.trend-entry-short  {
   color: #2fe68d; 
   text-shadow: 0 0 8px #2fe68d;
 }
-.big-short::before {
+.trend-entry-short::before {
   background: #00E676;
   box-shadow: 0 0 12cqb #00E676;
 }
 
-.small-entry-long {
+.reverse-entry-long {
   color: #a6a1e9;
   text-shadow: 0 0 2px #a6a1e9;
 }
-.small-entry-long::before {
+.reverse-entry-long::before {
   background: #7d88e6;
   box-shadow: 0 0 3px #7d88e6;
 }
 
-.small-entry-short {
+.reverse-entry-short {
   color: #a6a1e9;
   text-shadow: 0 0 2px #a6a1e9;
 }
-.small-entry-short::before {
+.reverse-entry-short::before {
   background: #7d88e6;
   box-shadow: 0 0 3px #7d88e6;
 }

@@ -21,8 +21,10 @@ export const getTrendLabel = (state: string): string => {
       return '做空';
       case 'down':
         return '做空';
-    case 'flat':
-      return '跟随';
+    case 'uprange':
+      return '跟多';
+    case 'downrange':
+      return '跟空';
     default:
       return '—';
   }
