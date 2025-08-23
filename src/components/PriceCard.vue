@@ -95,9 +95,10 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
   --bg-dark: #0b1324;
   --bg-card: #0d1b36;
   --shadow-glow: rgba(0, 246, 255, 0.3);
+  --font-size: 22px;
 
   font-family: "Inter", system-ui, sans-serif;
-  font-size: 20px;
+  font-size: var(--font-size);
   color: var(--color-primary);
   user-select: none;
 }
@@ -107,7 +108,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
-  font-size: 20px;
+  font-size: var(--font-size);
   letter-spacing: 0.06em;
   color: var(--color-primary);
 }
@@ -119,7 +120,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
   position: absolute;
   right: 28px;
   top: 18px;
-  font-size: 20px;
+  font-size: var(--font-size);
   color: #5599bb;
   letter-spacing: 0.02em;
   user-select: none;
@@ -151,7 +152,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
 /* æ ‡ç­¾ */
 .label {
   flex-shrink: 0;
-  font-size: 20px;
+  font-size: var(--font-size);
   width: 45px;
   color: var(--color-primary);
 }
@@ -159,7 +160,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
 /* ä»·æ ¼å€¼ */
 .value {
   font-weight: 400;
-  font-size: 20px;
+  font-size: var(--font-size);
   margin-left: 200px;
   color: var(--color-primary);
   font-variant-numeric: tabular-nums;
@@ -234,7 +235,7 @@ usePolling(() => refreshPrice(), API_CONFIG.POLLING.PRICE_INTERVAL, false); // ä
 .error-message {
   color: var(--color-negative);
   font-weight: 700;
-  font-size: 20px;
+  font-size: var(--font-size);
   margin-bottom: 16px;
   text-shadow: 0 0 8px var(--color-negative);
 }

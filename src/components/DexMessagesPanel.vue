@@ -87,6 +87,7 @@ const handleClick = (text: string) => {
   max-height: calc((108px + 12px) * 5); /* 60px是li的高度，12px是gap */
   overflow-y: auto; /* 只纵向滚动 */
   overflow-x: hidden; /* 禁止横向滚动 */
+  --font-size: 22px;
 }
 
 /* 滚动条美化（可选） */
@@ -170,7 +171,7 @@ const handleClick = (text: string) => {
 .message-time {
   opacity: 0.8;
   font-variant-numeric: tabular-nums;
-  font-size: 20px;
+  font-size: var(--font-size);
   color: #a0c4ff;
 }
 
@@ -182,7 +183,7 @@ const handleClick = (text: string) => {
   margin: 0;
   white-space: pre-wrap;
   font-family: inherit;
-  font-size: 20px;
+  font-size: var(--font-size);
   line-height: 1.4;
   color: #ffffff;
   background: transparent;
@@ -224,7 +225,7 @@ const handleClick = (text: string) => {
 }
 
 .error-icon {
-  font-size: 20px;
+  font-size: var(--font-size);
 }
 
 .no-data {
@@ -261,7 +262,7 @@ const handleClick = (text: string) => {
   align-items: center;
   color: #a0c4ff;
   font-weight: 600;
-  font-size: 20px;
+  font-size: var(--font-size);
   z-index: 10;
   pointer-events: none;
 }

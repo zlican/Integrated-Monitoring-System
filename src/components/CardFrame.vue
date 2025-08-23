@@ -28,6 +28,6 @@ defineProps<{
 }
 
 .updated {
-  font-size: 20px;
+  font-size: 22px;
 }
 </style>
