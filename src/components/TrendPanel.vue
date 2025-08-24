@@ -92,15 +92,15 @@ const getIrrationalMoment = (framesData: Record<string, string>) => {
     const mid = framesData['15m']
     const large = framesData['1h']
 
-    if (large == "buymacd" && mid == "buymacd" && small == "buymacd") return '多'
-    if (large == "sellmacd" && mid == "sellmacd" && small == "sellmacd") return '空'
+    if ((large == "buymacd" || large == "range") && mid == "buymacd" && small == "buymacd") return '多'
+    if ((large == "sellmacd" || large == "range") && mid == "sellmacd" && small == "sellmacd") return '空'
     return '不管'
   } else {
     const small = framesData['4h']
     const mid = framesData['1d']
     const large = framesData['3d']
-    if (large == "buymacd" && mid == "buymacd" && small == "buymacd") return '多'
-    if (large == "sellmacd" && mid == "sellmacd" && small == "sellmacd") return '空'
+    if ((large == "buymacd" || large == "range") && mid == "buymacd" && small == "buymacd") return '多'
+    if ((large == "sellmacd" || large == "range") && mid == "sellmacd" && small == "sellmacd") return '空'
     return '不管'
   }
 }
@@ -116,9 +116,7 @@ const getTrendClass = (trend: string) => {
   return {
     'trend-buymacd': trend === 'buymacd',
     'trend-sellmacd': trend === 'sellmacd',
-    'trend-up': trend === 'up',
-    'trend-down': trend === 'down',
-    'trend-flat': trend === 'flat'
+    'trend-range': trend === 'range'
   };
 };
 
@@ -152,7 +150,7 @@ usePolling(() => {
   --color-sellmacd: #9c27b0;
   --color-up:#ffc107;
   --color-down:#9c27b0;
-  --color-flat: #9e9e9e;
+  --color-range: #9e9e9e;
 
   --bg-card: #0d1b36;
   --bg-row: rgba(13, 27, 54, 0.3);
@@ -304,7 +302,7 @@ usePolling(() => {
   box-shadow: 0 0 12px var(--color-down);
 }
 
-.trend-flat {
+.trend-range {
   background: linear-gradient(90deg, 
     rgba(255, 107, 107, 0.2),  /* 柔红 */
     rgba(255, 159, 28, 0.2),   /* 柔橙 */
@@ -320,7 +318,7 @@ usePolling(() => {
   animation: rainbowMove 6s ease infinite; /* 让渐变流动 */
 }
 
-.trend-flat::before {
+.trend-range::before {
   background: #fff;
   box-shadow: 0 0 12px #fff;
 }

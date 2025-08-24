@@ -5,24 +5,20 @@ import { PriceApiService, TrendApiService } from '@/services/api';
 // 趋势状态映射函数
 const mapTrendState = (apiState: TrendApiState, interval: string): string => {
   switch (apiState) {
-    case 'BUYMACD': return 'buymacd';    // 金叉
-    case 'UP': return 'up';
-    case 'SELLMACD': return 'sellmacd';    // 死叉
-    case 'DOWN': return 'down'
-    case 'RANGE': return 'flat';      // 随机漫步
-    default: return 'flat';
+    case 'BUYMACD': return 'buymacd';    // 多
+    case 'SELLMACD': return 'sellmacd';    // 空
+    case 'RANGE': return 'range';      // 跟随
+    default: return 'unknown';
   }
 };
 
 // 新增：长线趋势状态映射函数
 const mapLongTermTrendState = (apiState: TrendApiState): string => {
   switch (apiState) {
-    case 'BUYMACD': return 'buymacd';    // 金叉
-    case 'UP': return 'up';
-    case 'SELLMACD': return 'sellmacd';    // 死叉
-    case 'DOWN': return 'down'
-    case 'RANGE': return 'flat';      // 随机漫步
-    default: return 'flat';
+    case 'BUYMACD': return 'buymacd';    // 多
+    case 'SELLMACD': return 'sellmacd';    // 空
+    case 'RANGE': return 'range';      // 跟随
+    default: return 'unknown';
   }
 };
 
