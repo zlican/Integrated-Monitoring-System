@@ -144,7 +144,7 @@ export class TrendApiService {
 
 // CEX消息API服务
 export class CexApiService {
-  private static async fetchCexMessages(limit: number = 4): Promise<CexMessage[]> {
+  private static async fetchCexMessages(limit: number = 10): Promise<CexMessage[]> {
     const url = `http://127.0.0.1:8888/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
     if (!res.ok) {
@@ -153,7 +153,7 @@ export class CexApiService {
     return await res.json();
   }
 
-  static async getLatestCexMessages(limit: number = 5): Promise<CexMessagesResp> {
+  static async getLatestCexMessages(limit: number = 10): Promise<CexMessagesResp> {
     try {
       const messages = await this.fetchCexMessages(limit);
       

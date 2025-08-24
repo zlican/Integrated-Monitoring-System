@@ -5,7 +5,7 @@
       <ul v-if="displayedMessages.length" class="messages-list">
       <li v-for="message in deduplicatedMessages" 
       :key="message.timestamp"
-      :class="['message-item clickable', { 'fade-in': firstLoad }]"
+      :class="['message-item clickable', { 'fade-in': firstLoad , 'highlight': isLatestMinute(message.timestamp) }]"
       @click="handleClick(message.text)">
         <div class="message-header">
           <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
@@ -32,6 +32,22 @@ const props = defineProps<{
   error: string | null;
 }>();
 
+// 取最新的“分钟时间戳”
+const latestMinute = computed(() => {
+  if (!deduplicatedMessages.value || deduplicatedMessages.value.length === 0) return null;
+  const latest = deduplicatedMessages.value[0]; // 你的数据应该是最新在前
+  if (!latest.timestamp) return null;
+  const d = new Date(latest.timestamp);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+});
+
+// 判断某条消息是否在最新分钟
+const isLatestMinute = (timestamp: string | undefined) => {
+  if (!timestamp || !latestMinute.value) return false;
+  const d = new Date(timestamp);
+  const t = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+  return t === latestMinute.value;
+};
 const trades = useTradesStore();
 
 // 使用去重的DEX消息
@@ -123,33 +139,6 @@ const highlightAddresses = (text: string) => {
   position: relative;
   transform: scale(1.02);
   transition: all 0.3s ease;
-}
-/* 呼吸动画 */
-@keyframes highlightPulse {
-  0% {
-    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(160, 196, 255, 0.7);
-    transform: scale(1.015);
-  }
-  100% {
-    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
-    transform: scale(1);
-  }
-}
-
-/* 悬停增强效果（均匀发光，不集中在右上角） */
-.messages-list li:first-child:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 128, 255, 0.25) 0%,
-    rgba(0, 128, 255, 0.15) 40%,
-    rgba(0, 0, 0, 0.35) 100%
-  );
-  box-shadow: 0 0 10px rgba(160, 196, 255, 0.7);
-  transform: translateX(4px);
 }
 
 .message-item {
@@ -278,5 +267,53 @@ const highlightAddresses = (text: string) => {
   font-size: var(--font-size);
   z-index: 10;
   pointer-events: none;
+}
+/* 高亮最新分钟的 li */
+.message-item.highlight {
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 128, 255, 0.15) 0%,
+    rgba(0, 128, 255, 0.05) 40%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  padding: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
+  border: 1px solid rgba(160, 196, 255, 0.6);
+  box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+  animation: highlightPulse 2.5s ease-in-out infinite;
+  position: relative;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+/* 悬停增强效果（均匀发光+轻微浮动） */
+.message-item.highlight:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 128, 255, 0.25) 0%,
+    rgba(0, 128, 255, 0.15) 40%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  box-shadow: 0 0 15px rgba(160, 196, 255, 0.9);
+  transform: translateY(-3px) scale(1.03);
+  transition: all 0.25s ease-in-out;
+}
+
+/* 呼吸动画 */
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(160, 196, 255, 0.7);
+    transform: scale(1.015);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+    transform: scale(1);
+  }
 }
 </style>

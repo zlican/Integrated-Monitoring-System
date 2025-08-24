@@ -221,7 +221,7 @@ export const useTradesStore = defineStore('trades', {
     },
 
     // 获取CEX消息
-    async fetchCexMessages(limit: number = 5) {
+    async fetchCexMessages(limit: number = 10) {
       this.loading.cexMessages = true;
       this.error.cexMessages = null;
       

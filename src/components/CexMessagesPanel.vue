@@ -7,6 +7,7 @@
         v-for="message in messages"
         :key="message.timestamp"
         class="message-item"
+        :class="{ highlight: isLatestMinute(message.timestamp) }"
       >
         <div class="message-header">
           <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
@@ -34,6 +35,35 @@ const props = defineProps<{
   error: string | null;
   updatedAt?: string;
 }>();
+
+
+// 取最新的“分钟时间戳”
+const latestMinute = computed(() => {
+  if (!props.messages || props.messages.length === 0) return null;
+
+  const toMs = (s: string | undefined) => {
+    if (!s) return -Infinity;
+    const fixed = s.replace(/(\.\d{3})\d+/, '$1'); // 截取到毫秒
+    const d = new Date(fixed);
+    return isNaN(d.getTime()) ? -Infinity : d.getTime();
+  };
+
+  const latest = props.messages.reduce((a, b) =>
+    toMs(a.timestamp) >= toMs(b.timestamp) ? a : b
+  );
+
+  if (!latest.timestamp) return null;
+  const d = new Date(latest.timestamp);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+});
+
+// 判断某个消息是否属于最新分钟
+const isLatestMinute = (timestamp: string | undefined) => {
+  if (!timestamp || !latestMinute.value) return false;
+  const d = new Date(timestamp);
+  const t = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+  return t === latestMinute.value;
+};
 
 const updatedAt = computed(() => {
   if (!props.messages || props.messages.length === 0) return '';
@@ -98,33 +128,7 @@ const updatedAt = computed(() => {
   transform: scale(1.02);
   transition: all 0.3s ease;
 }
-/* 呼吸动画 */
-@keyframes highlightPulse {
-  0% {
-    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(160, 196, 255, 0.7);
-    transform: scale(1.015);
-  }
-  100% {
-    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
-    transform: scale(1);
-  }
-}
 
-/* 悬停增强效果（均匀发光，不集中在右上角） */
-.messages-list li:first-child:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 128, 255, 0.25) 0%,
-    rgba(0, 128, 255, 0.15) 40%,
-    rgba(0, 0, 0, 0.35) 100%
-  );
-  box-shadow: 0 0 10px rgba(160, 196, 255, 0.7);
-  transform: translateX(4px);
-}
 
 .message-item {
   background: rgba(0, 0, 0, 0.25);
@@ -227,5 +231,51 @@ const updatedAt = computed(() => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+/* highlight class 替代 li:first-child */
+.message-item.highlight {
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 128, 255, 0.15) 0%,
+    rgba(0, 128, 255, 0.05) 40%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  padding: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
+  border: 1px solid rgba(160, 196, 255, 0.6);
+  box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+  animation: highlightPulse 2.5s ease-in-out infinite;
+  position: relative;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(160, 196, 255, 0.7);
+    transform: scale(1.015);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(160, 196, 255, 0.4);
+    transform: scale(1);
+  }
+}
+/* 高亮项 hover 效果 */
+.message-item.highlight:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 128, 255, 0.25) 0%,
+    rgba(0, 128, 255, 0.15) 40%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  box-shadow: 0 0 15px rgba(160, 196, 255, 0.9);
+  transform: translateY(-3px) scale(1.03);
+  transition: all 0.25s ease-in-out;
 }
 </style>
