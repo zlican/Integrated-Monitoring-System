@@ -6,7 +6,8 @@
       <li
         v-for="(message, idx) in messages"
         :key="message.timestamp || idx"
-        class="message-item"
+        class="message-item clickable"
+         @click="handleClick(message.text)"
       >
         <div class="message-content">
           <pre class="message-text">{{ message.text }}</pre>
@@ -37,6 +38,28 @@ const displayTime = (ts?: string) => {
   if (!ts) return '';
   const real = ts.split('-')[0];
   return real;
+};
+// 点击事件处理
+const handleClick = (text: string) => {
+  // 先尝试匹配地址
+  const addressMatch = text.match(/[A-Za-z0-9]{30,}/);
+  if (addressMatch) {
+    const address = addressMatch[0];
+    const url = `https://gmgn.ai/sol/token/${address}`;
+    window.open(url, '_blank');
+    return;
+  }
+
+  // 再尝试匹配币种（CEX消息里形如 🔴做空：🔴ETHUSDT）
+  const symbolMatch = text.match(/([A-Z]{2,5})USDT/); // 匹配 ETHUSDT、BTCUSDT 等
+  if (symbolMatch) {
+    const symbol = symbolMatch[1]; // 取 ETH
+    const url = `https://app.hyperliquid.xyz/trade/${symbol}`;
+    window.open(url, '_blank');
+    return;
+  }
+
+  alert('未找到有效地址或币种，无法跳转');
 };
 </script>
 
@@ -71,6 +94,7 @@ const displayTime = (ts?: string) => {
 
 .error { padding: 20px; color: #ff6b6b; text-align: center; }
 .no-data { padding: 20px; text-align: center; color: #a0c4ff; opacity: 0.7; }
+.clickable { cursor: pointer; }
 </style>
 
 

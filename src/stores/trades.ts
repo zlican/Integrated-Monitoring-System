@@ -45,7 +45,7 @@ export const useTradesStore = defineStore('trades', {
     recentDexMessagesDeduplicated: (state) => {
       if (!state.dexMessages?.messages) return [];
       
-      const halfHourAgo = Date.now() - 30 * 60 * 1000; // 30分钟前
+      const halfHourAgo = Date.now() - 15 * 60 * 1000; // 15分钟前
       
       // 过滤最近半小时的消息
       const recentMessages = state.dexMessages.messages.filter(msg => 

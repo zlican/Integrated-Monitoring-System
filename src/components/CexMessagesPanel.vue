@@ -8,6 +8,7 @@
         :key="message.timestamp"
         class="message-item"
         :class="{ highlight: isLatestMinute(message.timestamp) }"
+        @click="handleClick(message.text)"
       >
         <div class="message-header">
           <span class="message-time">{{ formatTimeMessage(message.timestamp) }}</span>
@@ -79,6 +80,28 @@ const updatedAt = computed(() => {
   const latest = props.messages.reduce((a, b) => (toMs(a.timestamp) >= toMs(b.timestamp) ? a : b));
   return latest.timestamp || '';
 });
+// 点击事件处理
+const handleClick = (text: string) => {
+  // 先尝试匹配地址
+  const addressMatch = text.match(/[A-Za-z0-9]{30,}/);
+  if (addressMatch) {
+    const address = addressMatch[0];
+    const url = `https://gmgn.ai/sol/token/${address}`;
+    window.open(url, '_blank');
+    return;
+  }
+
+  // 再尝试匹配币种（CEX消息里形如 🔴做空：🔴ETHUSDT）
+  const symbolMatch = text.match(/([A-Z]{2,5})USDT/); // 匹配 ETHUSDT、BTCUSDT 等
+  if (symbolMatch) {
+    const symbol = symbolMatch[1]; // 取 ETH
+    const url = `https://app.hyperliquid.xyz/trade/${symbol}`;
+    window.open(url, '_blank');
+    return;
+  }
+
+  alert('未找到有效地址或币种，无法跳转');
+};
 </script>
 
 <style scoped>
