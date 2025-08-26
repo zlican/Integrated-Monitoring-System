@@ -291,19 +291,62 @@ export class DexApiService {
     }
     return await res.json();
   }
-
   static async getLatestDexMessages(limit: number = 25): Promise<DexMessagesResp> {
     try {
-      const messages = await this.fetchDexMessages(limit);
-      
-      // 按时间倒序排列
-      const sortedMessages = messages.sort((a, b) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      );
-      
+      const raw = await this.fetchDexMessages(limit);
+  
+      type Aug = DexMessage & {
+        _ts: number;
+        _symbol: string;
+      };
+  
+      // 预处理：抽取 symbol + 时间戳
+      const msgs: Aug[] = raw
+        .map(m => {
+          // 简单规则：取第一个非空词作为 symbol（你可以换成 extractSymbol）
+          const symbolMatch = m.text.match(/([A-Z0-9]+USDT|Lore)/i);
+          const symbol = symbolMatch ? symbolMatch[1].toUpperCase() : null;
+          if (!symbol) return null;
+  
+          return {
+            ...m,
+            _ts: new Date(m.timestamp).getTime(),
+            _symbol: symbol,
+          };
+        })
+        .filter((x): x is Aug => !!x);
+  
+      // 升序遍历，保证先处理早期消息
+      msgs.sort((a, b) => a._ts - b._ts);
+  
+      const kept: Aug[] = [];
+      const state: Record<string, { lastInvalid: number }> = {};
+  
+      for (const m of msgs) {
+        if (m.text.startsWith('⚠️信号失效')) {
+          // 清理 kept 中该 symbol 的历史消息
+          for (let i = kept.length - 1; i >= 0; i--) {
+            if (kept[i]._symbol === m._symbol) kept.splice(i, 1);
+          }
+          state[m._symbol] = { lastInvalid: m._ts };
+          continue;
+        }
+  
+        const st = state[m._symbol] ?? { lastInvalid: -Infinity };
+        // 如果消息时间在最后一次失效之前 → 跳过
+        if (m._ts <= st.lastInvalid) continue;
+  
+        kept.push(m);
+      }
+  
+      // 倒序返回
+      kept.sort((a, b) => b._ts - a._ts);
+  
+      const finalMessages: DexMessage[] = kept.map(({ _ts, _symbol, ...rest }) => rest);
+  
       return {
         updatedAt: new Date().toISOString(),
-        messages: sortedMessages
+        messages: finalMessages,
       };
     } catch (error) {
       console.error('获取DEX消息失败:', error);
