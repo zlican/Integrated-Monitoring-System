@@ -152,44 +152,72 @@ export class CexApiService {
     }
     return await res.json();
   }
-
   static async getLatestCexMessages(limit: number = 10): Promise<CexMessagesResp> {
     try {
       const raw = await this.fetchCexMessages(limit);
-
-      // 规范化：解析时间戳与提取symbol（仅处理包含symbol的行）
-      type Aug = CexMessage & { _ts: number; _symbol: string };
+  
+      type Aug = CexMessage & {
+        _ts: number;
+        _symbol: string;
+        _direction: 'long' | 'short' | null;
+      };
+  
       const msgs: Aug[] = raw
         .map(m => {
           const symbol = extractSymbol(m.text);
           if (!symbol) return null;
-          return { ...m, _ts: new Date(m.timestamp).getTime(), _symbol: symbol };
+          return {
+            ...m,
+            _ts: new Date(m.timestamp).getTime(),
+            _symbol: symbol,
+            _direction: extractDirection(m.text),
+          };
         })
         .filter((x): x is Aug => !!x);
-
-      // 第一趟：记录每个symbol的“最后一次失效时间”
-      const lastInvalid: Record<string, number> = {};
+  
+      // 升序扫描，保证先处理早期消息
+      msgs.sort((a, b) => a._ts - b._ts);
+  
+      const kept: Aug[] = [];
+      const state: Record<string, { direction: 'long' | 'short' | null; lastInvalid: number }> = {};
+  
       for (const m of msgs) {
+        const symbol = m._symbol;
+  
         if (isInvalidation(m.text)) {
-          const prev = lastInvalid[m._symbol] ?? -Infinity;
-          if (m._ts > prev) lastInvalid[m._symbol] = m._ts;
+          // 失效：清理 kept 中该 symbol 的历史消息
+          for (let i = kept.length - 1; i >= 0; i--) {
+            if (kept[i]._symbol === symbol) kept.splice(i, 1);
+          }
+          // 更新状态
+          state[symbol] = { direction: null, lastInvalid: m._ts };
+          continue;
+        }
+  
+        if (m._direction) {
+          const st = state[symbol] ?? { direction: null, lastInvalid: -Infinity };
+  
+          // 如果方向和之前不一样，清理掉 kept 中该 symbol 的旧方向
+          if (st.direction && st.direction !== m._direction) {
+            for (let i = kept.length - 1; i >= 0; i--) {
+              if (kept[i]._symbol === symbol) kept.splice(i, 1);
+            }
+          }
+  
+          // 如果消息时间在最后一次失效之前，则跳过
+          if (m._ts <= st.lastInvalid) continue;
+  
+          // 更新状态
+          state[symbol] = { direction: m._direction, lastInvalid: st.lastInvalid };
+          kept.push(m);
         }
       }
-
-      // 第二趟：过滤
-      const kept = msgs.filter(m => {
-        if (isInvalidation(m.text)) return false; // 不展示“失效”行
-        const inv = lastInvalid[m._symbol];
-        // 仅当消息时间严格晚于最后一次失效，或者根本没失效记录时，才保留
-        return inv === undefined || m._ts > inv;
-      });
-
-      // 按时间倒序返回
+  
+      // 倒序返回
       kept.sort((a, b) => b._ts - a._ts);
-
-      // 移除内部字段
-      const finalMessages: CexMessage[] = kept.map(({ _ts, _symbol, ...rest }) => rest);
-
+  
+      const finalMessages: CexMessage[] = kept.map(({ _ts, _symbol, _direction, ...rest }) => rest);
+  
       return {
         updatedAt: new Date().toISOString(),
         messages: finalMessages,
@@ -199,7 +227,6 @@ export class CexApiService {
       throw error;
     }
   }
-
   // 新增：CEX等待区消息（后端仅返回1条混合文本，需要前端拆分）
   private static async fetchCexWaitingRaw(limit: number = 1): Promise<CexMessage[]> {
     const url = `http://127.0.0.1:8888/api/latest-tg-messages-waiting?limit=${limit}`;
@@ -239,15 +266,20 @@ export class CexApiService {
   
 }
 
+
 function extractSymbol(text: string): string | null {
-  // 捕获类似 ABCUSDT / BTCUSDT 的交易对（允许前后有emoji与空格）
   const m = text.match(/([A-Z0-9]{2,}USDT)\b/);
   return m ? m[1] : null;
 }
 
 function isInvalidation(text: string): boolean {
-  // 关键字匹配：⚠️信号失效
   return text.includes('信号失效');
+}
+
+function extractDirection(text: string): 'long' | 'short' | null {
+  if (text.includes('做多')) return 'long';
+  if (text.includes('做空')) return 'short';
+  return null;
 }
 // DEX消息API服务
 export class DexApiService {
