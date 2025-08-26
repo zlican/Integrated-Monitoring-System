@@ -155,16 +155,44 @@ export class CexApiService {
 
   static async getLatestCexMessages(limit: number = 10): Promise<CexMessagesResp> {
     try {
-      const messages = await this.fetchCexMessages(limit);
-      
-      // 按时间倒序排列
-      const sortedMessages = messages.sort((a, b) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      );
-      
+      const raw = await this.fetchCexMessages(limit);
+
+      // 规范化：解析时间戳与提取symbol（仅处理包含symbol的行）
+      type Aug = CexMessage & { _ts: number; _symbol: string };
+      const msgs: Aug[] = raw
+        .map(m => {
+          const symbol = extractSymbol(m.text);
+          if (!symbol) return null;
+          return { ...m, _ts: new Date(m.timestamp).getTime(), _symbol: symbol };
+        })
+        .filter((x): x is Aug => !!x);
+
+      // 第一趟：记录每个symbol的“最后一次失效时间”
+      const lastInvalid: Record<string, number> = {};
+      for (const m of msgs) {
+        if (isInvalidation(m.text)) {
+          const prev = lastInvalid[m._symbol] ?? -Infinity;
+          if (m._ts > prev) lastInvalid[m._symbol] = m._ts;
+        }
+      }
+
+      // 第二趟：过滤
+      const kept = msgs.filter(m => {
+        if (isInvalidation(m.text)) return false; // 不展示“失效”行
+        const inv = lastInvalid[m._symbol];
+        // 仅当消息时间严格晚于最后一次失效，或者根本没失效记录时，才保留
+        return inv === undefined || m._ts > inv;
+      });
+
+      // 按时间倒序返回
+      kept.sort((a, b) => b._ts - a._ts);
+
+      // 移除内部字段
+      const finalMessages: CexMessage[] = kept.map(({ _ts, _symbol, ...rest }) => rest);
+
       return {
         updatedAt: new Date().toISOString(),
-        messages: sortedMessages
+        messages: finalMessages,
       };
     } catch (error) {
       console.error('获取CEX消息失败:', error);
@@ -208,8 +236,19 @@ export class CexApiService {
       messages
     };
   }
+  
 }
 
+function extractSymbol(text: string): string | null {
+  // 捕获类似 ABCUSDT / BTCUSDT 的交易对（允许前后有emoji与空格）
+  const m = text.match(/([A-Z0-9]{2,}USDT)\b/);
+  return m ? m[1] : null;
+}
+
+function isInvalidation(text: string): boolean {
+  // 关键字匹配：⚠️信号失效
+  return text.includes('信号失效');
+}
 // DEX消息API服务
 export class DexApiService {
   private static async fetchDexMessages(limit: number = 25): Promise<DexMessage[]> {
