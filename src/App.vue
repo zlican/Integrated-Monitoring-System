@@ -32,11 +32,8 @@
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />
-      <DexMessagesPanel 
-        :messages="displayedDexMessages"
-        :loading="trades.loading.dexMessages"
-        :error="trades.error.dexMessages"
-      />
+      <SecurePosition></SecurePosition>
+
 
 
       <CexMessagesWaitingPanel
@@ -50,6 +47,11 @@
         :loading="trades.loading.dexWaiting"
         :error="trades.error.dexWaiting"
         :updatedAt="trades.dexWaitingMessages?.updatedAt"
+      />
+      <DexMessagesPanel 
+        :messages="displayedDexMessages"
+        :loading="trades.loading.dexMessages"
+        :error="trades.error.dexMessages"
       />
     </div>
 
@@ -72,6 +74,7 @@ import CexMessagesWaitingPanel from '@/components/CexMessagesWaitingPanel.vue';
 import DexMessagesPanel from '@/components/DexMessagesPanel.vue';
 import DexMessagesWaitingPanel from '@/components/DexMessagesWaitingPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
+import SecurePosition from './components/SecurePosition.vue';
 
 const trades = useTradesStore();
 const market = useMarketStore();
