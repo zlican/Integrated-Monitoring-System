@@ -104,11 +104,12 @@
   
   /* 每一项：水平排列 label 与输入框，同一行 */
   .form-item {
+    margin-top: 30px;
     display: flex;
     align-items: center;
     gap: 14px;
     width: 100%;
-    max-width: 640px; /* 调整为更宽，适配同一行 */
+    max-width: 680px; /* 调整为更宽，适配同一行 */
     flex-wrap: wrap;  /* 在窄屏时允许换行 */
   }
   
@@ -117,22 +118,23 @@
     font-size: 24px;
     color: #a0c4ff;
     font-weight: 600;
-    min-width: 210px; /* 保证对齐，可按需要调整 */
+    min-width: 144px; /* 保证对齐，可按需要调整 */
     cursor: pointer;  /* 鼠标手型 */
     user-select: none;
   }
   
   /* 输入框容器：可点击，显示手型 */
   .input-wrapper {
+
     flex: 1 1 320px;
-    min-width: 320px;
+    min-width: 400px;
     display: flex;
     align-items: center;
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(160, 196, 255, 0.3);
-    border-radius: 14px;
+    border-radius: 25px;
     padding: 10px 14px;
-    height: 80px;
+    height: 96px;
     transition: all 0.25s ease;
     cursor: pointer; /* 手型 */
   }
