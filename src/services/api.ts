@@ -193,20 +193,26 @@ export class CexApiService {
           state[symbol] = { direction: null, lastInvalid: m._ts };
           continue;
         }
-  
         if (m._direction) {
           const st = state[symbol] ?? { direction: null, lastInvalid: -Infinity };
-  
+        
           // 如果方向和之前不一样，清理掉 kept 中该 symbol 的旧方向
           if (st.direction && st.direction !== m._direction) {
             for (let i = kept.length - 1; i >= 0; i--) {
               if (kept[i]._symbol === symbol) kept.splice(i, 1);
             }
           }
-  
+        
           // 如果消息时间在最后一次失效之前，则跳过
           if (m._ts <= st.lastInvalid) continue;
-  
+        
+          // ✅ 如果已经存在相同方向的消息，先清理掉旧的
+          for (let i = kept.length - 1; i >= 0; i--) {
+            if (kept[i]._symbol === symbol && kept[i]._direction === m._direction) {
+              kept.splice(i, 1);
+            }
+          }
+        
           // 更新状态
           state[symbol] = { direction: m._direction, lastInvalid: st.lastInvalid };
           kept.push(m);
@@ -303,9 +309,18 @@ export class DexApiService {
       // 预处理：抽取 symbol + 时间戳
       const msgs: Aug[] = raw
         .map(m => {
-          // 简单规则：取第一个非空词作为 symbol（你可以换成 extractSymbol）
-          const symbolMatch = m.text.match(/([A-Z0-9]+USDT|Lore)/i);
-          const symbol = symbolMatch ? symbolMatch[1].toUpperCase() : null;
+          let symbol: string | null = null;
+  
+          if (m.text.startsWith('⚠️信号失效')) {
+            // 失效消息：冒号或全角冒号后的 symbol
+            const match = m.text.match(/[:：]\s*([A-Z0-9]+)/i);
+            if (match) symbol = match[1].toUpperCase();
+          } else {
+            // 普通信号：开头的🟢/⚠️ + 字母数字
+            const match = m.text.match(/^[⚠️🟢]*\s*([A-Z0-9]+)/i);
+            if (match) symbol = match[1].toUpperCase();
+          }
+  
           if (!symbol) return null;
   
           return {
@@ -316,26 +331,34 @@ export class DexApiService {
         })
         .filter((x): x is Aug => !!x);
   
-      // 升序遍历，保证先处理早期消息
+      // 升序扫描，保证先处理早期消息
       msgs.sort((a, b) => a._ts - b._ts);
   
       const kept: Aug[] = [];
       const state: Record<string, { lastInvalid: number }> = {};
   
       for (const m of msgs) {
+        const symbol = m._symbol;
+  
         if (m.text.startsWith('⚠️信号失效')) {
-          // 清理 kept 中该 symbol 的历史消息
+          // 失效：清理 kept 中该 symbol 的历史消息
           for (let i = kept.length - 1; i >= 0; i--) {
-            if (kept[i]._symbol === m._symbol) kept.splice(i, 1);
+            if (kept[i]._symbol === symbol) kept.splice(i, 1);
           }
-          state[m._symbol] = { lastInvalid: m._ts };
+          // 更新状态
+          state[symbol] = { lastInvalid: m._ts };
           continue;
         }
   
-        const st = state[m._symbol] ?? { lastInvalid: -Infinity };
+        const st = state[symbol] ?? { lastInvalid: -Infinity };
         // 如果消息时间在最后一次失效之前 → 跳过
         if (m._ts <= st.lastInvalid) continue;
-  
+        
+        // ✅ 保证同一个 symbol 只保留最新的
+        for (let i = kept.length - 1; i >= 0; i--) {
+          if (kept[i]._symbol === symbol) kept.splice(i, 1);
+        }
+        
         kept.push(m);
       }
   
