@@ -55,6 +55,9 @@
         <p class="value">杠杆：{{ leverage.toFixed(2) }} X </p>
       </div>
       <div v-else class="placeholder">请输入参数以计算杠杆率</div>
+
+          <!-- 右下角清空按钮 -->
+    <button class="clear-fab" @click="clearAll" title="清空所有数据">🗑️</button>
     </CardFrame>
   </template>
   
@@ -90,6 +93,11 @@
     if (denom <= 0) return null
     return maxLoss.value / denom
   })
+  function clearAll() {
+  atr.value = null
+  price.value = null
+  maxLoss.value = null
+}
   </script>
   
   <style scoped>
@@ -229,4 +237,28 @@
       width: 100%;
     }
   }
+  /* 右下角小图标按钮 */
+.clear-fab {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  background: rgba(79, 195, 247, 0.15);
+  border: 1px solid rgba(79, 195, 247, 0.4);
+  color: #4fc3f7;
+  font-size: 26px;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-fab:hover {
+  background: rgba(79, 195, 247, 0.25);
+  border-color: #64d2ff;
+  box-shadow: 0 0 12px rgba(79, 195, 247, 0.5);
+}
   </style>

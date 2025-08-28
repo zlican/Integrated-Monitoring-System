@@ -56,8 +56,15 @@
     </div>
 
     <div class="control-panel">
-      <button @click="refreshAll" class="control-btn refresh">刷新所有数据</button>
-    </div>
+  <button 
+    @click="handleRefresh" 
+    class="control-btn refresh"
+    :disabled="loadingRefresh"
+  >
+    <span v-if="!loadingRefresh">🔄</span>
+    <span v-else class="spinner">🔄</span>
+  </button>
+</div>
   </main>
 </template>
 
@@ -137,17 +144,39 @@ const checkApiStatus = async () => {
   }
 };
 
-const refreshAll = async () => {
-  await Promise.all([
-    market.fetchPrice(),
-    market.fetchTrendA(),
-    market.fetchLongTermTrend(),
-    trades.fetchDexInfo(),
-    trades.fetchCexMessages(),
-    trades.fetchDexMessages()
-  ]);
+const loadingRefresh = ref(false);
+
+const handleRefresh = async () => {
+  if (loadingRefresh.value) return; // 防止重复点击
+  loadingRefresh.value = true;
+
+  try {
+    await refreshAll();  // 调用之前定义的真实数据刷新函数
+  } catch (error) {
+    console.error('刷新失败:', error);
+  } finally {
+    loadingRefresh.value = false;
+  }
 };
 
+
+const refreshAll = async () => {
+  try {
+    // 同步触发所有真实 API 请求
+    await Promise.all([
+      market.fetchPrice(),           // 获取最新价格
+      market.fetchTrendA(),          // 短线趋势
+      market.fetchLongTermTrend(),   // 长线趋势
+      trades.fetchDexInfo(),         // DEX 信息
+      trades.fetchCexMessages(),     // CEX 消息
+      trades.fetchDexMessages(),     // DEX 消息
+      trades.fetchCexWaitingMessages(), // CEX等待区
+      trades.fetchDexWaitingMessages()  // DEX等待区
+    ]);
+  } catch (error) {
+    console.error('刷新所有数据失败:', error);
+  }
+};
 onMounted(async () => {
   await trades.initSnapshots();
   await trades.fetchCexMessages();
@@ -277,24 +306,32 @@ onBeforeUnmount(() => {
 
 .control-panel {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 36px;
+  right: 36px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   z-index: 1000;
 }
-
 .control-btn {
+  width: 64px;        /* 按钮大小，可按需调整 */
+  height: 64px;
+  font-size: 36px;    /* 图标字体大小 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;         /* 去掉默认内边距 */
+  border-radius: 50px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #cfe9ff;
-  padding: 8px 12px;
-  font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .control-btn:hover {
@@ -338,4 +375,14 @@ onBeforeUnmount(() => {
     font-size: 11px;
   }
 }
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 </style> 
