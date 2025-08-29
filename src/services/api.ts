@@ -221,9 +221,17 @@ export class CexApiService {
   
       // 倒序返回
       kept.sort((a, b) => b._ts - a._ts);
+          // ✅ 额外优化：若 BTCUSDT 或 ETHUSDT 存在，则只保留它们
+    const hasBTC = kept.some(m => m._symbol === 'BTCUSDT');
+    const hasETH = kept.some(m => m._symbol === 'ETHUSDT');
+
+    let final = kept;
+    if (hasBTC || hasETH) {
+      final = kept.filter(m => m._symbol === 'BTCUSDT' || m._symbol === 'ETHUSDT');
+    }
   
-      const finalMessages: CexMessage[] = kept.map(({ _ts, _symbol, _direction, ...rest }) => rest);
-  
+    const finalMessages: CexMessage[] = final.map(({ _ts, _symbol, _direction, ...rest }) => rest);
+
       return {
         updatedAt: new Date().toISOString(),
         messages: finalMessages,
