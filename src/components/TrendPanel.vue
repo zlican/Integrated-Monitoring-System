@@ -92,15 +92,15 @@ const getIrrationalMoment = (framesData: Record<string, string>) => {
     const mid = framesData['15m']
     const large = framesData['1h']
 
-    if ((large == "buymacd" || large == "range") && mid == "buymacd" && small == "buymacd") return '多'
-    if ((large == "sellmacd" || large == "range") && mid == "sellmacd" && small == "sellmacd") return '空'
+    if (large == "buymacd"  && mid == "buymacd" && small == "buymacd") return '多'
+    if (large == "sellmacd"  && mid == "sellmacd" && small == "sellmacd") return '空'
     return '不管'
   } else {
     const small = framesData['4h']
     const mid = framesData['1d']
     const large = framesData['3d']
-    if ((large == "buymacd" || large == "range") && mid == "buymacd" && small == "buymacd") return '多'
-    if ((large == "sellmacd" || large == "range") && mid == "sellmacd" && small == "sellmacd") return '空'
+    if (large == "buymacd" && mid == "buymacd" && small == "buymacd") return '多'
+    if (large == "sellmacd" && mid == "sellmacd" && small == "sellmacd") return '空'
     return '不管'
   }
 }
