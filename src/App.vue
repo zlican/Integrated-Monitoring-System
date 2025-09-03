@@ -61,7 +61,7 @@
         :error="trades.error.dexWaiting"
         :updatedAt="trades.dexWaitingMessages?.updatedAt"
       />
-      <SecurePosition></SecurePosition>
+      <SecurePositionSidebar />
     </div>
 
     <div class="control-panel">
@@ -87,12 +87,12 @@ import PriceCard from '@/components/PriceCard.vue';
 import TrendPanel from '@/components/TrendPanel.vue';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
 import CexMessagesWaitingPanel from '@/components/CexMessagesWaitingPanel.vue';
-import DexMessagesPanel from '@/components/DexMessagesPanel.vue';
 import DexMessagesWaitingPanel from '@/components/DexMessagesWaitingPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
 import SecurePosition from './components/SecurePosition.vue';
 import CexLongPanel from './components/CexLongPanel.vue';
 import CexLongWaitingPanel from './components/CexLongWaitingPanel.vue';
+import SecurePositionSidebar from './components/SecurePositionSidebar.vue';
 
 const trades = useTradesStore();
 const market = useMarketStore();

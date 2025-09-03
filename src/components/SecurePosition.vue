@@ -9,13 +9,15 @@
         <div class="input-wrapper" @click="focusInput('price')">
           <span class="icon">💰</span>
           <input
-            :id="ids.price"
-            ref="priceRef"
-            type="number"
-            v-model.number="price"
-            placeholder="请输入当前价格"
-            inputmode="decimal"
-          />
+  :id="ids.price"
+  ref="priceRef"
+  type="number"
+  step="0.01"
+  inputmode="decimal"
+  autocomplete="off"
+  v-model.number="price"
+  placeholder="请输入"
+/>
         </div>
       </div>
       <!-- 新增：中时 EMA25 -->
@@ -28,8 +30,10 @@
             ref="ema25Ref"
             type="number"
             v-model.number="ema25"
-            placeholder="请输入中时 EMA25"
-            inputmode="decimal"
+            placeholder="请输入"
+            step="0.01"
+  inputmode="decimal"
+  autocomplete="off"
           />
         </div>
       </div>
@@ -42,8 +46,10 @@
             ref="atrRef"
             type="number"
             v-model.number="atr"
-            placeholder="请输入 ATR"
-            inputmode="decimal"
+            placeholder="请输入"
+            step="0.01"
+  inputmode="decimal"
+  autocomplete="off"
           />
         </div>
       </div>
@@ -59,8 +65,10 @@
             ref="maxLossRef"
             type="number"
             v-model.number="maxLoss"
-            placeholder="请输入最大止损百分比"
-            inputmode="decimal"
+            placeholder="请输入"
+            step="0.01"
+  inputmode="decimal"
+  autocomplete="off"
           />
         </div>
       </div>
@@ -158,171 +166,178 @@ function clearAll() {
 
   
   <style scoped>
-  /* 表单整体：垂直堆叠，但每一项内部是水平布局 */
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin: 20px 0;
-    align-items: center;
-  }
-  
-  /* 每一项：水平排列 label 与输入框，同一行 */
-  .form-item {
-    margin-top: 30px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
-    max-width: 680px; /* 调整为更宽，适配同一行 */
-    flex-wrap: wrap;  /* 在窄屏时允许换行 */
-  }
-  
-  /* 标签：22px，点击聚焦对应输入框 */
-  .label {
-    font-size: 24px;
-    color: #a0c4ff;
-    font-weight: 600;
-    min-width: 144px; /* 保证对齐，可按需要调整 */
-    cursor: pointer;  /* 鼠标手型 */
-    user-select: none;
-  }
-  
-  /* 输入框容器：可点击，显示手型 */
-  .input-wrapper {
+:root {
+  --field-bg: rgba(0, 0, 0, 0.22);
+  --field-border: rgba(160, 196, 255, 0.28);
+  --field-hover: rgba(0, 0, 0, 0.28);
+  --field-focus: rgba(79, 195, 247, 0.16);
+  --field-ring: rgba(79, 195, 247, 0.65);
+  --label: #bbd4ff;
+  --placeholder: rgba(200,220,255,0.45);
+  --result: #4fc3f7;
+  --danger: #ff6b6b;
+}
 
-    flex: 1 1 320px;
-    min-width: 400px;
-    display: flex;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(160, 196, 255, 0.3);
-    border-radius: 25px;
-    padding: 10px 14px;
-    height: 96px;
-    transition: all 0.25s ease;
-    cursor: pointer; /* 手型 */
-  }
-  
-  .input-wrapper:hover {
-    border-color: #64d2ff;
-    box-shadow: 0 0 10px rgba(79, 195, 247, 0.35);
-    background: rgba(0, 0, 0, 0.3);
-  }
-  
-  .input-wrapper:focus-within {
-    border-color: #4fc3f7;
-    box-shadow: 0 0 12px rgba(79, 195, 247, 0.6);
-    background: rgba(0, 0, 0, 0.35);
-  }
-  
-  .icon {
-    margin-right: 12px;
-    font-size: 28px;
-    opacity: 0.75;
-  }
-  
-  /* 输入框：22px，透明背景 */
-  input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 28px;
-    outline: none;
-    width: 100%;
-  }
-  
-  /* 去除 number 类型的增减按钮（Chrome/Safari/Edge） */
-  input[type='number']::-webkit-outer-spin-button,
-  input[type='number']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  
-  /* 去除 Firefox 的增减按钮 */
-  input[type='number'] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-  
-  /* 结果区 */
-  .result {
-    margin-top: 50px;
-    text-align: center;
-    animation: fadeIn 0.6s ease-in;
-  }
-  .value {
-    font-size: 50px;
-    margin-top: 30px;
-    font-weight: bold;
-    color: #4fc3f7;
-    text-shadow: 0 0 12px rgba(79, 195, 247, 0.8);
-    animation: pulseGlow 2.5s infinite;
-  }
-  
-  .placeholder {
-    margin-top: 32px;
-    text-align: center;
-    color: #a0c4ff;
-    opacity: 0.65;
-    font-size: 24px;
-  }
-  
-  /* 动画 */
-  @keyframes pulseGlow {
-    0% { text-shadow: 0 0 6px rgba(79, 195, 247, 0.6); }
-    50% { text-shadow: 0 0 16px rgba(79, 195, 247, 0.9); }
-    100% { text-shadow: 0 0 6px rgba(79, 195, 247, 0.6); }
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* 响应式：在非常窄的屏幕上让标签换行到上方，避免拥挤 */
-  @media (max-width: 480px) {
-    .form-item {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .label {
-      min-width: 0;
-    }
-    .input-wrapper {
-      width: 100%;
-    }
-  }
-  /* 右下角小图标按钮 */
-.clear-fab {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  background: rgba(79, 195, 247, 0.15);
-  border: 1px solid rgba(79, 195, 247, 0.4);
-  color: #4fc3f7;
-  font-size: 26px;
-  border-radius: 50%;
-  width: 56px;
-  height: 56px;
-  cursor: pointer;
-  transition: all 0.25s ease;
+/* 表单整体 */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 10px 0 6px;
+  align-items: center;
+}
+
+/* 每一项 */
+.form-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 680px;
+  flex-wrap: wrap;
+  margin-top: 16px;
 }
 
-.clear-fab:hover {
-  background: rgba(79, 195, 247, 0.25);
-  border-color: #64d2ff;
-  box-shadow: 0 0 12px rgba(79, 195, 247, 0.5);
-}
-.stoploss {
-  font-size: 32px;
-  margin-top: 20px;
+/* 标签更轻、更易读 */
+.label {
+  font-size: 18px;
+  color: var(--label);
   font-weight: 600;
-  color: #ff6b6b;
-  text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
+  min-width: 120px;
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.2px;
 }
+
+/* 输入容器：高度更合理，边框更柔 */
+.input-wrapper {
+  flex: 1 1 320px;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 16px;
+  padding: 10px 12px;
+  height: 60px;
+  transition: all 0.2s ease;
+  cursor: text; /* 更符合直觉 */
+}
+
+.input-wrapper:hover {
+  border-color: #64d2ff;
+  background: var(--field-hover);
+  box-shadow: 0 0 0 3px rgba(100,210,255,0.12);
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--field-ring);
+  background: var(--field-focus);
+  box-shadow: 0 0 0 3px rgba(79,195,247,0.25);
+}
+
+.icon {
+  margin-right: 10px;
+  font-size: 20px;
+  opacity: 0.75;
+}
+
+/* 输入本体 */
+input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 18px;
+  outline: none;
+  width: 100%;
+}
+input::placeholder { color: var(--placeholder); }
+
+/* number 微件去除（保持你的兼容写法） */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
+
+/* 结果区：层次更明显 */
+.result {
+  margin-top: 28px;
+  text-align: center;
+  animation: fadeIn 0.35s ease-in;
+}
+.value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--result);
+  text-shadow: 0 0 10px rgba(79, 195, 247, 0.7);
+}
+.value::before {
+  font-size: 12px;
+  font-weight: 700;
+  color: #c7e7ff;
+  letter-spacing: .5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(79,195,247,.35);
+  background: rgba(79,195,247,.08);
+}
+
+.stoploss {
+  font-size: 24px;
+  margin-top: 12px;
+  font-weight: 600;
+  color: var(--danger);
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.55);
+}
+
+.placeholder {
+  margin-top: 16px;
+  text-align: center;
+  color: #a0c4ff;
+  opacity: 0.7;
+  font-size: 16px;
+}
+
+/* 清空按钮更轻巧，悬浮卡片风 */
+.clear-fab {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  background: rgba(79, 195, 247, 0.12);
+  border: 1px solid rgba(79, 195, 247, 0.35);
+  color: #d8f3ff;
+  font-size: 20px;
+  border-radius: 14px;
+  width: 48px;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.clear-fab:hover {
+  background: rgba(79, 195, 247, 0.2);
+  border-color: #64d2ff;
+  box-shadow: 0 6px 18px rgba(79, 195, 247, 0.22);
+}
+
+/* 动画优化 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .value { text-shadow: none; animation: none; }
+}
+
+/* 窄屏优化：标签上置，控件占满 */
+@media (max-width: 480px) {
+  .form-item { flex-direction: column; align-items: stretch; margin-top: 12px; }
+  .label { min-width: 0; font-size: 16px; }
+  .input-wrapper { min-width: 100%; height: 56px; }
+}
+
   </style>
