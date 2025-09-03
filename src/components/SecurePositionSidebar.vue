@@ -128,7 +128,7 @@
   
   <style scoped>
   :root {
-    --sp-width: 420px;
+    --sp-width: 520px;
     --glass-bg: rgba(12,16,34,0.92);
     --glass-border: rgba(255,255,255,0.08);
     --accent: #19c37d;
@@ -228,7 +228,7 @@
   }
   .sidebar-title {
     margin: 0;
-    font-size: 16px;
+    font-size: 24px;
     color: #a0c4ff;
     letter-spacing: .2px;
     font-weight: 600;

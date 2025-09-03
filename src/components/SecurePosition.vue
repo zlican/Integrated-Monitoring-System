@@ -1,6 +1,6 @@
 <template>
   <CardFrame>
-    <template #title>仓位管理计算器</template>
+    <template #title>以损定仓</template>
 
     <!-- 输入表单 -->
     <div class="form">
@@ -200,7 +200,7 @@ function clearAll() {
 
 /* 标签更轻、更易读 */
 .label {
-  font-size: 18px;
+  font-size: 22px;
   color: var(--label);
   font-weight: 600;
   min-width: 120px;
@@ -238,7 +238,7 @@ function clearAll() {
 
 .icon {
   margin-right: 10px;
-  font-size: 20px;
+  font-size: 22px;
   opacity: 0.75;
 }
 
@@ -248,7 +248,7 @@ input {
   border: none;
   background: transparent;
   color: #fff;
-  font-size: 18px;
+  font-size: 22px;
   outline: none;
   width: 100%;
 }
@@ -269,13 +269,13 @@ input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
   display: inline-flex;
   align-items: baseline;
   gap: 10px;
-  font-size: 42px;
+  font-size: 48px;
   font-weight: 800;
   color: var(--result);
   text-shadow: 0 0 10px rgba(79, 195, 247, 0.7);
 }
 .value::before {
-  font-size: 12px;
+  font-size: 22px;
   font-weight: 700;
   color: #c7e7ff;
   letter-spacing: .5px;
@@ -286,7 +286,7 @@ input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
 }
 
 .stoploss {
-  font-size: 24px;
+  font-size: 28px;
   margin-top: 12px;
   font-weight: 600;
   color: var(--danger);
@@ -298,20 +298,20 @@ input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
   text-align: center;
   color: #a0c4ff;
   opacity: 0.7;
-  font-size: 16px;
+  font-size: 22px;
 }
 
 /* 清空按钮更轻巧，悬浮卡片风 */
 .clear-fab {
   position: absolute;
   right: 16px;
-  bottom: 16px;
+  top: 16px;
   background: rgba(79, 195, 247, 0.12);
   border: 1px solid rgba(79, 195, 247, 0.35);
   color: #d8f3ff;
-  font-size: 20px;
-  border-radius: 14px;
-  width: 48px;
+  font-size: 22px;
+  border-radius: 50px;
+  width: 40px;
   height: 40px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -336,7 +336,7 @@ input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
 /* 窄屏优化：标签上置，控件占满 */
 @media (max-width: 480px) {
   .form-item { flex-direction: column; align-items: stretch; margin-top: 12px; }
-  .label { min-width: 0; font-size: 16px; }
+  .label { min-width: 0; font-size: 22px; }
   .input-wrapper { min-width: 100%; height: 56px; }
 }
 
