@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { Trade, DexInfoResp, CexMessagesResp, CexMessage, DexMessagesResp, DexMessage } from '@/types';
+import type { Trade, DexInfoResp, CexMessagesResp, CexMessage, DexMessagesResp, DexMessage, CexMessagesRespL } from '@/types';
 import { CexApiService, DexApiService } from '@/services/api';
 
 export const useTradesStore = defineStore('trades', {
@@ -14,7 +14,9 @@ export const useTradesStore = defineStore('trades', {
       cexMessages: false,
       cexWaiting: false,
       dexMessages: false,
-      dexWaiting: false
+      dexWaiting: false,
+      cexLong:false,
+      cexWaitingLong: false
     },
     error: {
       cex: null as string | null,
@@ -23,13 +25,20 @@ export const useTradesStore = defineStore('trades', {
       cexMessages: null as string | null,
       cexWaiting: null as string | null,
       dexMessages: null as string | null,
-      dexWaiting: null as string | null
+      dexWaiting: null as string | null,
+      cexLong: null as string | null,
+      cexWaitingLong: null as string | null,
     },
     
     // CEX消息相关状态
     cexMessages: null as CexMessagesResp | null,
     // CEX等待区消息
     cexWaitingMessages: null as CexMessagesResp | null,
+    
+    // CEX消息长线相关状态
+    cexMessagesL: null as CexMessagesRespL | null,
+    // CEX等待区消息
+    cexWaitingMessagesL: null as CexMessagesRespL | null,
     
     // DEX消息相关状态
     dexMessages: null as DexMessagesResp | null,
@@ -243,6 +252,29 @@ export const useTradesStore = defineStore('trades', {
         this.loading.cexMessages = false;
       }
     },
+        // 获取CEX消息
+        async fetchCexMessagesL(limit: number = 10) {
+          this.loading.cexLong = true;
+          this.error.cexLong = null;
+          
+          try {
+            const messagesData = await CexApiService.getLatestCexMessagesL(limit);
+            this.cexMessagesL = messagesData;
+          } catch (error) {
+            this.error.cexLong = '获取CEX长线消息失败';
+            console.error('Failed to fetch CEX messages:', error);
+            
+            // 如果API调用失败，使用模拟数据作为备用
+            const fallbackData: CexMessagesRespL = {
+              updatedAt: new Date().toISOString(),
+              messages: [
+              ]
+            };
+            this.cexMessagesL = fallbackData;
+          } finally {
+            this.loading.cexLong = false;
+          }
+        },
 
     // 获取CEX等待区消息
     async fetchCexWaitingMessages(limit: number = 1) {
@@ -267,7 +299,29 @@ export const useTradesStore = defineStore('trades', {
         this.loading.cexWaiting = false;
       }
     },
-
+// 获取CEX等待区消息
+async fetchCexWaitingMessagesL(limit: number = 1) {
+  this.loading.cexWaitingLong = true;
+  this.error.cexWaitingLong = null;
+  try {
+    const data = await CexApiService.getCexWaitingMessagesL(limit);
+    // 将同一timestamp的多条内容，用timestamp+序号供前端key稳定
+    const ts = data.messages?.[0]?.timestamp;
+    if (ts) {
+      data.messages = data.messages.map((m: CexMessage, i: number) => ({ ...m, timestamp: `${ts}-${i}` }));
+    }
+    this.cexWaitingMessagesL = data;
+  } catch (error) {
+    this.error.cexWaitingLong = '获取CEX等待区消息失败';
+    console.error('Failed to fetch CEX waiting messages:', error);
+    this.cexWaitingMessagesL = {
+      updatedAt: new Date().toISOString(),
+      messages: []
+    };
+  } finally {
+    this.loading.cexWaitingLong = false;
+  }
+},
     // 获取DEX消息
     async fetchDexMessages(limit: number = 25) {
       this.loading.dexMessages = true;

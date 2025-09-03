@@ -27,12 +27,19 @@
         :loading="trades.loading.cexMessages"
         :error="trades.error.cexMessages"
       />
+      <CexLongPanel 
+        :messages="displayedCexMessagesL"
+        :loading="trades.loading.cexLong"
+        :error="trades.error.cexLong"
+      />
       <DexMessagesDeduplicatedPanel 
         :messages="displayedDexMessages"
         :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages"
       />
-      <SecurePosition></SecurePosition>
+      
+
+      
 
 
 
@@ -42,17 +49,19 @@
         :error="trades.error.cexWaiting"
         :updatedAt="trades.cexWaitingMessages?.updatedAt"
       />
+      <CexLongWaitingPanel
+        :messages="trades.cexWaitingMessagesL?.messages || []"
+        :loading="trades.loading.cexWaitingLong"
+        :error="trades.error.cexWaitingLong"
+        :updatedAt="trades.cexWaitingMessagesL?.updatedAt"
+      />
       <DexMessagesWaitingPanel
         :messages="trades.dexWaitingMessages?.messages || []"
         :loading="trades.loading.dexWaiting"
         :error="trades.error.dexWaiting"
         :updatedAt="trades.dexWaitingMessages?.updatedAt"
       />
-      <DexMessagesPanel 
-        :messages="displayedDexMessages"
-        :loading="trades.loading.dexMessages"
-        :error="trades.error.dexMessages"
-      />
+      <SecurePosition></SecurePosition>
     </div>
 
     <div class="control-panel">
@@ -82,6 +91,8 @@ import DexMessagesPanel from '@/components/DexMessagesPanel.vue';
 import DexMessagesWaitingPanel from '@/components/DexMessagesWaitingPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
 import SecurePosition from './components/SecurePosition.vue';
+import CexLongPanel from './components/CexLongPanel.vue';
+import CexLongWaitingPanel from './components/CexLongWaitingPanel.vue';
 
 const trades = useTradesStore();
 const market = useMarketStore();
@@ -94,7 +105,7 @@ const apiStatus = ref({
 });
 
 // 稳定引用，避免 CEX 消息闪烁
-import type { CexMessage, DexMessage } from '@/types';
+import type { CexMessage, CexMessageL, DexMessage } from '@/types';
 const displayedCexMessages = ref<CexMessage[]>([]);
 watch(() => trades.cexMessages?.messages, (newMessages) => {
   if (!newMessages) {
@@ -107,6 +118,22 @@ watch(() => trades.cexMessages?.messages, (newMessages) => {
   const newKeys = updated.map(m => m.timestamp).join(',');
   if (oldKeys !== newKeys) {
     displayedCexMessages.value = updated;
+  }
+}, { immediate: true });
+
+
+const displayedCexMessagesL = ref<CexMessageL[]>([]);
+watch(() => trades.cexMessagesL?.messages, (newMessages) => {
+  if (!newMessages) {
+    displayedCexMessagesL.value = [];
+    return;
+  }
+  const oldMap = new Map(displayedCexMessagesL.value.map((m: CexMessage) => [m.timestamp, m]));
+  const updated = newMessages.map((m: CexMessage) => oldMap.get(m.timestamp) || m);
+  const oldKeys = displayedCexMessagesL.value.map(m => m.timestamp).join(',');
+  const newKeys = updated.map(m => m.timestamp).join(',');
+  if (oldKeys !== newKeys) {
+    displayedCexMessagesL.value = updated;
   }
 }, { immediate: true });
 
@@ -171,7 +198,10 @@ const refreshAll = async () => {
       trades.fetchCexMessages(),     // CEX 消息
       trades.fetchDexMessages(),     // DEX 消息
       trades.fetchCexWaitingMessages(), // CEX等待区
-      trades.fetchDexWaitingMessages()  // DEX等待区
+      trades.fetchDexWaitingMessages(),  // DEX等待区
+      trades.fetchCexMessagesL(),
+      trades.fetchCexWaitingMessagesL
+
     ]);
   } catch (error) {
     console.error('刷新所有数据失败:', error);
@@ -181,6 +211,8 @@ onMounted(async () => {
   await trades.initSnapshots();
   await trades.fetchCexMessages();
   await trades.fetchCexWaitingMessages();
+  await trades.fetchCexMessagesL();
+  await trades.fetchCexWaitingMessagesL();
   await trades.fetchDexMessages();
   await trades.fetchDexWaitingMessages();
   await checkApiStatus();
@@ -210,6 +242,9 @@ onMounted(async () => {
   setInterval(() => {
     trades.fetchCexMessages();
   }, 30000);
+  setInterval(() => {
+    trades.fetchCexMessagesL();
+  }, 30000);
 
   setInterval(() => {
     trades.fetchDexMessages();
@@ -221,6 +256,9 @@ onMounted(async () => {
 
   setInterval(() => {
     trades.fetchCexWaitingMessages();
+  }, 30000);
+  setInterval(() => {
+    trades.fetchCexWaitingMessagesL();
   }, 30000);
 });
 

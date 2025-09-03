@@ -1,104 +1,161 @@
 <template>
-    <CardFrame>
-      <template #title>仓位管理计算器</template>
-  
-      <!-- 输入表单 -->
-      <div class="form">
-        <div class="form-item">
-          <label class="label" :for="ids.price">当前价格</label>
-          <div class="input-wrapper" @click="focusInput('price')">
-            <span class="icon">💰</span>
-            <input
-              :id="ids.price"
-              ref="priceRef"
-              type="number"
-              v-model.number="price"
-              placeholder="请输入当前价格"
-              inputmode="decimal"
-            />
-          </div>
-        </div>
-  
-        <div class="form-item">
-          <label class="label" :for="ids.atr">ATR</label>
-          <div class="input-wrapper" @click="focusInput('atr')">
-            <span class="icon">📈</span>
-            <input
-              :id="ids.atr"
-              ref="atrRef"
-              type="number"
-              v-model.number="atr"
-              placeholder="请输入 ATR"
-              inputmode="decimal"
-            />
-          </div>
-        </div>
-  
-        <div class="form-item">
-          <label class="label" :for="ids.maxLoss">最大止损</label>
-          <div class="input-wrapper" @click="focusInput('maxLoss')">
-            <span class="icon">⚡</span>
-            <input
-              :id="ids.maxLoss"
-              ref="maxLossRef"
-              type="number"
-              v-model.number="maxLoss"
-              placeholder="请输入最大止损百分比"
-              inputmode="decimal"
-            />
-          </div>
-        </div>
-      </div>
-  
-      <!-- 结果展示 -->
-      <div class="result" v-if="leverage !== null">
-        <p class="value">杠杆：{{ leverage.toFixed(2) }} X </p>
-      </div>
-      <div v-else class="placeholder">请输入参数以计算杠杆率</div>
+  <CardFrame>
+    <template #title>仓位管理计算器</template>
 
-          <!-- 右下角清空按钮 -->
+    <!-- 输入表单 -->
+    <div class="form">
+      <div class="form-item">
+        <label class="label" :for="ids.price">当前价格</label>
+        <div class="input-wrapper" @click="focusInput('price')">
+          <span class="icon">💰</span>
+          <input
+            :id="ids.price"
+            ref="priceRef"
+            type="number"
+            v-model.number="price"
+            placeholder="请输入当前价格"
+            inputmode="decimal"
+          />
+        </div>
+      </div>
+      <!-- 新增：中时 EMA25 -->
+      <div class="form-item">
+        <label class="label" :for="ids.ema25">中时 EMA25</label>
+        <div class="input-wrapper" @click="focusInput('ema25')">
+          <span class="icon">📊</span>
+          <input
+            :id="ids.ema25"
+            ref="ema25Ref"
+            type="number"
+            v-model.number="ema25"
+            placeholder="请输入中时 EMA25"
+            inputmode="decimal"
+          />
+        </div>
+      </div>
+      <div class="form-item">
+        <label class="label" :for="ids.atr">ATR</label>
+        <div class="input-wrapper" @click="focusInput('atr')">
+          <span class="icon">📈</span>
+          <input
+            :id="ids.atr"
+            ref="atrRef"
+            type="number"
+            v-model.number="atr"
+            placeholder="请输入 ATR"
+            inputmode="decimal"
+          />
+        </div>
+      </div>
+
+
+
+      <div class="form-item">
+        <label class="label" :for="ids.maxLoss">最大止损</label>
+        <div class="input-wrapper" @click="focusInput('maxLoss')">
+          <span class="icon">⚡</span>
+          <input
+            :id="ids.maxLoss"
+            ref="maxLossRef"
+            type="number"
+            v-model.number="maxLoss"
+            placeholder="请输入最大止损百分比"
+            inputmode="decimal"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 结果展示 -->
+    <div class="result" v-if="leverage !== null">
+  <p class="value">杠杆：{{ leverage.toFixed(2) }} X </p>
+  <p class="stoploss" v-if="stopLossPrice !== null">止损价格：{{ stopLossPrice.toFixed(2) }}</p>
+</div>
+    <div v-else class="placeholder">请输入参数以计算杠杆率</div>
+
+    <!-- 右下角清空按钮 -->
     <button class="clear-fab" @click="clearAll" title="清空所有数据">🗑️</button>
-    </CardFrame>
-  </template>
-  
-  <script setup lang="ts">
-  import { computed, ref } from 'vue'
-  import CardFrame from './CardFrame.vue'
-  
-  const atr = ref<number | null>(null)
-  const price = ref<number | null>(null)
-  const maxLoss = ref<number | null>(null)
-  
-  // 生成稳定的 id，便于 label for 关联
-  const ids = {
-    price: 'input-price',
-    atr: 'input-atr',
-    maxLoss: 'input-maxloss',
+  </CardFrame>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import CardFrame from './CardFrame.vue'
+
+const atr = ref<number | null>(null)
+const price = ref<number | null>(null)
+const ema25 = ref<number | null>(null)
+  const maxLoss = ref<number>(2)
+
+// 生成稳定的 id，便于 label for 关联
+const ids = {
+  price: 'input-price',
+  atr: 'input-atr',
+  ema25: 'input-ema25',
+  maxLoss: 'input-maxloss',
+}
+
+// 引用以便点击容器时让 input 获得焦点
+const priceRef = ref<HTMLInputElement | null>(null)
+const atrRef = ref<HTMLInputElement | null>(null)
+const ema25Ref = ref<HTMLInputElement | null>(null)
+const maxLossRef = ref<HTMLInputElement | null>(null)
+
+const stopLossPrice = computed(() => {
+  if (!atr.value || !price.value || !ema25.value) return null
+
+  const diffBased = price.value - ema25.value + 0.5 * atr.value
+  const atrBased = 2 * atr.value
+
+  if (diffBased <= atrBased) {
+    // 用 diffBased 逻辑
+    if (price.value > ema25.value) {
+      return ema25.value - 0.5 * atr.value
+    } else {
+      return ema25.value + 0.5 * atr.value
+    }
+  } else {
+    // 用 2 ATR 逻辑
+    if (price.value > ema25.value) {
+      return price.value - 2 * atr.value
+    } else {
+      return price.value + 2 * atr.value
+    }
   }
-  
-  // 引用以便点击容器时让 input 获得焦点
-  const priceRef = ref<HTMLInputElement | null>(null)
-  const atrRef = ref<HTMLInputElement | null>(null)
-  const maxLossRef = ref<HTMLInputElement | null>(null)
-  
-  function focusInput(key: 'price' | 'atr' | 'maxLoss') {
-    if (key === 'price') priceRef.value?.focus()
-    if (key === 'atr') atrRef.value?.focus()
-    if (key === 'maxLoss') maxLossRef.value?.focus()
-  }
-  
-  const leverage = computed(() => {
-    if (!atr.value || !price.value || !maxLoss.value) return null
-    const denom = (atr.value / price.value) * 1.5 * 100
-    if (denom <= 0) return null
-    return maxLoss.value / denom
-  })
-  function clearAll() {
+})
+
+function focusInput(key: 'price' | 'atr' | 'ema25' | 'maxLoss') {
+  if (key === 'price') priceRef.value?.focus()
+  if (key === 'atr') atrRef.value?.focus()
+  if (key === 'ema25') ema25Ref.value?.focus()
+  if (key === 'maxLoss') maxLossRef.value?.focus()
+}
+
+const leverage = computed(() => {
+  if (!atr.value || !price.value || !ema25.value || !maxLoss.value) return null
+
+  // 计算两个候选值
+  const diffBased = price.value - ema25.value + 0.5 * atr.value
+  const atrBased = 2 * atr.value
+
+  // 取较小值
+  const riskBasis = Math.min(diffBased, atrBased)
+
+  // 分母计算
+  const denom = (riskBasis / price.value) * 100
+  if (denom <= 0) return null
+
+  return maxLoss.value / denom
+})
+
+function clearAll() {
   atr.value = null
   price.value = null
-  maxLoss.value = null
+  ema25.value = null
+  maxLoss.value = 2
 }
-  </script>
+</script>
+
   
   <style scoped>
   /* 表单整体：垂直堆叠，但每一项内部是水平布局 */
@@ -260,5 +317,12 @@
   background: rgba(79, 195, 247, 0.25);
   border-color: #64d2ff;
   box-shadow: 0 0 12px rgba(79, 195, 247, 0.5);
+}
+.stoploss {
+  font-size: 32px;
+  margin-top: 20px;
+  font-weight: 600;
+  color: #ff6b6b;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
 }
   </style>
