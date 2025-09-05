@@ -1,8 +1,8 @@
 // 趋势状态类型
-export type TrendState = 'buymacd' | 'sellmacd' | 'range' |  'unknown';
+export type TrendState = 'buymacd' | 'xbuymid' | 'sellmacd' | 'xsellmid' | 'range' |  'unknown';
 
 // 新增：趋势分析API返回的原始状态类型
-export type TrendApiState = 'BUYMACD' | 'SELLMACD' | 'RANGE' | 'unknown';
+export type TrendApiState = 'BUYMACD' | 'XBUYMID' |'SELLMACD' | 'XSELLMID' | 'RANGE' | 'unknown';
 
 // 趋势分析响应类型
 export interface TrendAnalysisResp {

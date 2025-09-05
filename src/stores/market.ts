@@ -8,6 +8,8 @@ const mapTrendState = (apiState: TrendApiState, interval: string): string => {
     case 'BUYMACD': return 'buymacd';    // 多
     case 'SELLMACD': return 'sellmacd';    // 空
     case 'RANGE': return 'range';      // 跟随
+    case 'XBUYMID':return 'xbuymid';
+    case 'XSELLMID': return 'xsellmid';
     default: return 'unknown';
   }
 };
@@ -18,6 +20,8 @@ const mapLongTermTrendState = (apiState: TrendApiState): string => {
     case 'BUYMACD': return 'buymacd';    // 多
     case 'SELLMACD': return 'sellmacd';    // 空
     case 'RANGE': return 'range';      // 跟随
+    case 'XBUYMID':return 'xbuymid';
+    case 'XSELLMID':return 'xsellmid';
     default: return 'unknown';
   }
 };

@@ -92,15 +92,15 @@ const getIrrationalMoment = (framesData: Record<string, string>) => {
     const mid = framesData['15m']
     const large = framesData['1h']
 
-    if (large == "buymacd"  && mid == "buymacd" && small == "buymacd") return '多'
-    if (large == "sellmacd"  && mid == "sellmacd" && small == "sellmacd") return '空'
+    if (large == "buymacd"  && ((mid == "buymacd" && small == "buymacd") || mid == "xbuymid")) return '多'
+    if (large == "sellmacd"  && ((mid == "sellmacd" && small == "sellmacd") || mid == "xsellmid")) return '空'
     return '不管'
   } else {
     const small = framesData['4h']
     const mid = framesData['1d']
     const large = framesData['3d']
-    if (large == "buymacd" && mid == "buymacd" && small == "buymacd") return '多'
-    if (large == "sellmacd" && mid == "sellmacd" && small == "sellmacd") return '空'
+    if (large == "buymacd" &&  ((mid == "buymacd" && small == "buymacd") || mid == "xbuymid")) return '多'
+    if (large == "sellmacd" &&((mid == "sellmacd" && small == "sellmacd") || mid == "xsellmid"))  return '空'
     return '不管'
   }
 }
@@ -115,7 +115,9 @@ const getIrrationalClass = (status: string) => {
 const getTrendClass = (trend: string) => {
   return {
     'trend-buymacd': trend === 'buymacd',
+    'trend-xbuymid': trend === 'xbuymid',
     'trend-sellmacd': trend === 'sellmacd',
+    'trend-xsellmid': trend === 'xsellmid',
     'trend-range': trend === 'range'
   };
 };
@@ -269,6 +271,20 @@ usePolling(() => {
   box-shadow: 0 0 12px var(--color-buymacd);
 }
 
+
+/* 状态颜色 */
+.trend-xbuymid {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.6);
+  color: #fff399;
+  text-shadow: 0 0 10px #ffc107;
+}
+.trend-xbuymid::before {
+  background: var(--color-buymacd);
+  box-shadow: 0 0 12px var(--color-buymacd);
+}
+
+
 .trend-sellmacd {
   background: rgba(156, 39, 176, 0.2);
   border-color: rgba(156, 39, 176, 0.6);
@@ -276,6 +292,17 @@ usePolling(() => {
   text-shadow: 0 0 10px #9c27b0;
 }
 .trend-sellmacd::before {
+  background: var(--color-sellmacd);
+  box-shadow: 0 0 12px var(--color-sellmacd);
+}
+
+.trend-xsellmid {
+  background: rgba(156, 39, 176, 0.2);
+  border-color: rgba(156, 39, 176, 0.6);
+  color: #d6a1f9;
+  text-shadow: 0 0 10px #9c27b0;
+}
+.trend-xsellmid::before {
   background: var(--color-sellmacd);
   box-shadow: 0 0 12px var(--color-sellmacd);
 }

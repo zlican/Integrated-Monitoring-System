@@ -3,7 +3,11 @@ export const getTrendColor = (state: string): string => {
   switch (state) {
     case 'buymacd':
       return '#ffc107'; //  金叉/多
+    case 'xbuymid':
+      return '#ffc107'; 
     case 'sellmacd':
+      return '#9c27b0'; // 死叉/空
+    case 'xsellmid':
       return '#9c27b0'; // 死叉/空
     default:
       return '#9e9e9e'; // 随机漫步
@@ -15,11 +19,16 @@ export const getTrendLabel = (state: string): string => {
   switch (state) {
     case 'buymacd':
       return '做多';
-      case 'up':
+    case 'xbuymid':
+      return '做多';
+    case 'up':
         return '做多';
+
     case 'sellmacd':
       return '做空';
-      case 'down':
+    case 'xsellmid':
+      return '做空';
+    case 'down':
         return '做空';
     case 'range':
       return '跟随';
