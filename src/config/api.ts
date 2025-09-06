@@ -40,8 +40,8 @@ export const API_CONFIG = {
   // 请求配置
   REQUEST: {
     TIMEOUT: 10000, // 10秒超时
-    RETRY_ATTEMPTS: 3, // 重试次数
-    RETRY_DELAY: 1000, // 重试延迟（毫秒）
+    RETRY_ATTEMPTS: 0, // 重试次数
+    RETRY_DELAY: 100000, // 重试延迟（毫秒）
   },
   
   // 轮询配置

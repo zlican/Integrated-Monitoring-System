@@ -15,65 +15,36 @@
       </div>
     </header>
 
-    <div class="grid top">
-      <PriceCard />
-      <TrendPanel kind="A" title="趋势分析（短线）" />
-      <TrendPanel kind="C" title="趋势分析（长线）" />
-    </div>
-
     <div class="grid bottom">
-      <CexMessagesPanel 
-        :messages="displayedCexMessages"
-        :loading="trades.loading.cexMessages"
-        :error="trades.error.cexMessages"
-      />
-      <CexLongPanel 
-        :messages="displayedCexMessagesL"
-        :loading="trades.loading.cexLong"
-        :error="trades.error.cexLong"
-      />
-      <DexMessagesDeduplicatedPanel 
-        :messages="displayedDexMessages"
-        :loading="trades.loading.dexMessages"
-        :error="trades.error.dexMessages"
-      />
-      
-
-      
+      <CexMessagesPanel :messages="displayedCexMessages" :loading="trades.loading.cexMessages"
+        :error="trades.error.cexMessages" />
+      <CexLongPanel :messages="displayedCexMessagesL" :loading="trades.loading.cexLong" :error="trades.error.cexLong" />
+      <DexMessagesDeduplicatedPanel :messages="displayedDexMessages" :loading="trades.loading.dexMessages"
+        :error="trades.error.dexMessages" />
 
 
 
-      <CexMessagesWaitingPanel
-        :messages="trades.cexWaitingMessages?.messages || []"
-        :loading="trades.loading.cexWaiting"
-        :error="trades.error.cexWaiting"
-        :updatedAt="trades.cexWaitingMessages?.updatedAt"
-      />
-      <CexLongWaitingPanel
-        :messages="trades.cexWaitingMessagesL?.messages || []"
-        :loading="trades.loading.cexWaitingLong"
-        :error="trades.error.cexWaitingLong"
-        :updatedAt="trades.cexWaitingMessagesL?.updatedAt"
-      />
-      <DexMessagesWaitingPanel
-        :messages="trades.dexWaitingMessages?.messages || []"
-        :loading="trades.loading.dexWaiting"
-        :error="trades.error.dexWaiting"
-        :updatedAt="trades.dexWaitingMessages?.updatedAt"
-      />
+
+
+
+      <CexMessagesWaitingPanel :messages="trades.cexWaitingMessages?.messages || []"
+        :loading="trades.loading.cexWaiting" :error="trades.error.cexWaiting"
+        :updatedAt="trades.cexWaitingMessages?.updatedAt" />
+      <CexLongWaitingPanel :messages="trades.cexWaitingMessagesL?.messages || []"
+        :loading="trades.loading.cexWaitingLong" :error="trades.error.cexWaitingLong"
+        :updatedAt="trades.cexWaitingMessagesL?.updatedAt" />
+      <DexMessagesWaitingPanel :messages="trades.dexWaitingMessages?.messages || []"
+        :loading="trades.loading.dexWaiting" :error="trades.error.dexWaiting"
+        :updatedAt="trades.dexWaitingMessages?.updatedAt" />
       <SecurePositionSidebar />
     </div>
 
     <div class="control-panel">
-  <button 
-    @click="handleRefresh" 
-    class="control-btn refresh"
-    :disabled="loadingRefresh"
-  >
-    <span v-if="!loadingRefresh">🔄</span>
-    <span v-else class="spinner">🔄</span>
-  </button>
-</div>
+      <button @click="handleRefresh" class="control-btn refresh" :disabled="loadingRefresh">
+        <span v-if="!loadingRefresh">🔄</span>
+        <span v-else class="spinner">🔄</span>
+      </button>
+    </div>
   </main>
 </template>
 
@@ -157,20 +128,6 @@ const updateOnlineStatus = () => {
   isOnline.value = navigator.onLine;
 };
 
-const checkApiStatus = async () => {
-  try {
-    const status = await apiUtils.getApiStatus();
-    apiStatus.value = status;
-  } catch (error) {
-    console.error('检查API状态失败:', error);
-    apiStatus.value = {
-      connected: false,
-      responseTime: 0,
-      lastCheck: new Date().toISOString()
-    };
-  }
-};
-
 const loadingRefresh = ref(false);
 
 const handleRefresh = async () => {
@@ -191,16 +148,12 @@ const refreshAll = async () => {
   try {
     // 同步触发所有真实 API 请求
     await Promise.all([
-      market.fetchPrice(),           // 获取最新价格
-      market.fetchTrendA(),          // 短线趋势
-      market.fetchLongTermTrend(),   // 长线趋势
-      trades.fetchDexInfo(),         // DEX 信息
       trades.fetchCexMessages(),     // CEX 消息
       trades.fetchDexMessages(),     // DEX 消息
       trades.fetchCexWaitingMessages(), // CEX等待区
       trades.fetchDexWaitingMessages(),  // DEX等待区
       trades.fetchCexMessagesL(),
-      trades.fetchCexWaitingMessagesL
+      trades.fetchCexWaitingMessagesL(),
 
     ]);
   } catch (error) {
@@ -208,36 +161,16 @@ const refreshAll = async () => {
   }
 };
 onMounted(async () => {
-  await trades.initSnapshots();
   await trades.fetchCexMessages();
   await trades.fetchCexWaitingMessages();
   await trades.fetchCexMessagesL();
   await trades.fetchCexWaitingMessagesL();
   await trades.fetchDexMessages();
   await trades.fetchDexWaitingMessages();
-  await checkApiStatus();
 
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
 
-  setInterval(() => {
-    if (Math.random() > 0.7) {
-      trades.addMockTrade('cex');
-    }
-    if (Math.random() > 0.7) {
-      trades.addMockTrade('dex');
-    }
-  }, 3000);
-
-  setInterval(checkApiStatus, API_CONFIG.POLLING.STATUS_CHECK_INTERVAL);
-
-  setInterval(() => {
-    market.fetchTrendA();
-  }, API_CONFIG.POLLING.TREND_INTERVAL);
-
-  setInterval(() => {
-    market.fetchLongTermTrend();
-  }, 300000);
 
   setInterval(() => {
     trades.fetchCexMessages();
@@ -270,13 +203,15 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .app-logo {
-  height: 100px; /* 根据需求调整 */
+  height: 100px;
+  /* 根据需求调整 */
   width: auto;
 }
+
 .app-container {
   min-height: 100vh;
   padding: 20px;
-  background: radial-gradient(1200px 600px at 20% 0%, rgba(0,100,200,0.2), transparent), #0c1022;
+  background: radial-gradient(1200px 600px at 20% 0%, rgba(0, 100, 200, 0.2), transparent), #0c1022;
 }
 
 .app-header {
@@ -351,14 +286,18 @@ onBeforeUnmount(() => {
   gap: 8px;
   z-index: 1000;
 }
+
 .control-btn {
-  width: 64px;        /* 按钮大小，可按需调整 */
+  width: 64px;
+  /* 按钮大小，可按需调整 */
   height: 64px;
-  font-size: 36px;    /* 图标字体大小 */
+  font-size: 36px;
+  /* 图标字体大小 */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;         /* 去掉默认内边距 */
+  padding: 0;
+  /* 去掉默认内边距 */
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -392,35 +331,40 @@ onBeforeUnmount(() => {
   .app-container {
     padding: 16px;
   }
-  
+
   .app-header {
     flex-direction: column;
     gap: 16px;
     text-align: center;
   }
-  
+
   .app-title {
     font-size: 24px;
   }
-  
+
   .control-panel {
     bottom: 16px;
     right: 16px;
   }
-  
+
   .control-btn {
     padding: 6px 10px;
     font-size: 11px;
   }
 }
+
 .spinner {
   display: inline-block;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
+  from {
+    transform: rotate(0deg);
+  }
 
-</style> 
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
