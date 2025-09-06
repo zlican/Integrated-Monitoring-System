@@ -1,20 +1,3 @@
-// 格式化价格显示
-
-export const formatPrice = (price: number | null | undefined): string => {
-  if (price == null) return '--';
-  return `$ ${price.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}`;
-};
-
-// 格式化数量显示
-export const formatQuantity = (qty: number, decimals: number = 4): string => {
-  return qty.toLocaleString(undefined, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  });
-};
 
 // 格式化时间（稳健）：接受 string|number|Date|null/undefined
 export const formatTime = (timestamp?: string | number | Date | null): string => {

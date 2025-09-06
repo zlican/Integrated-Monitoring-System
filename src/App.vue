@@ -2,17 +2,6 @@
   <main class="app-container">
     <header class="app-header">
       <img src="/banner.png" alt="交易一体化监控系统" class="app-logo" />
-      <div class="app-status">
-        <div class="status-row">
-          <span class="status-indicator" :class="{ online: isOnline }"></span>
-          {{ isOnline ? '在线' : '离线' }}
-        </div>
-        <div class="status-row">
-          <span class="api-status-indicator" :class="{ connected: apiStatus.connected }"></span>
-          API: {{ apiStatus.connected ? '已连接' : '未连接' }}
-          <span v-if="apiStatus.connected" class="response-time">({{ apiStatus.responseTime }}ms)</span>
-        </div>
-      </div>
     </header>
 
     <div class="grid bottom">
@@ -21,12 +10,6 @@
       <CexLongPanel :messages="displayedCexMessagesL" :loading="trades.loading.cexLong" :error="trades.error.cexLong" />
       <DexMessagesDeduplicatedPanel :messages="displayedDexMessages" :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages" />
-
-
-
-
-
-
       <CexMessagesWaitingPanel :messages="trades.cexWaitingMessages?.messages || []"
         :loading="trades.loading.cexWaiting" :error="trades.error.cexWaiting"
         :updatedAt="trades.cexWaitingMessages?.updatedAt" />
@@ -51,29 +34,17 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useTradesStore } from '@/stores/trades';
-import { useMarketStore } from '@/stores/market';
-import { apiUtils } from '@/services/api';
-import { API_CONFIG } from '@/config/api';
-import PriceCard from '@/components/PriceCard.vue';
-import TrendPanel from '@/components/TrendPanel.vue';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
 import CexMessagesWaitingPanel from '@/components/CexMessagesWaitingPanel.vue';
 import DexMessagesWaitingPanel from '@/components/DexMessagesWaitingPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
-import SecurePosition from './components/SecurePosition.vue';
 import CexLongPanel from './components/CexLongPanel.vue';
 import CexLongWaitingPanel from './components/CexLongWaitingPanel.vue';
 import SecurePositionSidebar from './components/SecurePositionSidebar.vue';
 
 const trades = useTradesStore();
-const market = useMarketStore();
 
 const isOnline = ref(navigator.onLine);
-const apiStatus = ref({
-  connected: false,
-  responseTime: 0,
-  lastCheck: ''
-});
 
 // 稳定引用，避免 CEX 消息闪烁
 import type { CexMessage, CexMessageL, DexMessage } from '@/types';
