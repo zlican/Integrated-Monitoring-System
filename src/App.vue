@@ -10,21 +10,12 @@
       <CexLongPanel :messages="displayedCexMessagesL" :loading="trades.loading.cexLong" :error="trades.error.cexLong" />
       <DexMessagesDeduplicatedPanel :messages="displayedDexMessages" :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages" />
-      <CexMessagesWaitingPanel :messages="trades.cexWaitingMessages?.messages || []"
-        :loading="trades.loading.cexWaiting" :error="trades.error.cexWaiting"
-        :updatedAt="trades.cexWaitingMessages?.updatedAt" />
-      <CexLongWaitingPanel :messages="trades.cexWaitingMessagesL?.messages || []"
-        :loading="trades.loading.cexWaitingLong" :error="trades.error.cexWaitingLong"
-        :updatedAt="trades.cexWaitingMessagesL?.updatedAt" />
-      <DexMessagesWaitingPanel :messages="trades.dexWaitingMessages?.messages || []"
-        :loading="trades.loading.dexWaiting" :error="trades.error.dexWaiting"
-        :updatedAt="trades.dexWaitingMessages?.updatedAt" />
       <SecurePositionSidebar />
     </div>
 
     <div class="control-panel">
       <button @click="handleRefresh" class="control-btn refresh" :disabled="loadingRefresh">
-        <span v-if="!loadingRefresh">🔄</span>
+        <span v-if="!loadingRefresh" class="size">🔄</span>
         <span v-else class="spinner">🔄</span>
       </button>
     </div>
@@ -35,11 +26,8 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useTradesStore } from '@/stores/trades';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
-import CexMessagesWaitingPanel from '@/components/CexMessagesWaitingPanel.vue';
-import DexMessagesWaitingPanel from '@/components/DexMessagesWaitingPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
 import CexLongPanel from './components/CexLongPanel.vue';
-import CexLongWaitingPanel from './components/CexLongWaitingPanel.vue';
 import SecurePositionSidebar from './components/SecurePositionSidebar.vue';
 
 const trades = useTradesStore();
@@ -121,11 +109,7 @@ const refreshAll = async () => {
     await Promise.all([
       trades.fetchCexMessages(),     // CEX 消息
       trades.fetchDexMessages(),     // DEX 消息
-      trades.fetchCexWaitingMessages(), // CEX等待区
-      trades.fetchDexWaitingMessages(),  // DEX等待区
       trades.fetchCexMessagesL(),
-      trades.fetchCexWaitingMessagesL(),
-
     ]);
   } catch (error) {
     console.error('刷新所有数据失败:', error);
@@ -133,11 +117,8 @@ const refreshAll = async () => {
 };
 onMounted(async () => {
   await trades.fetchCexMessages();
-  await trades.fetchCexWaitingMessages();
   await trades.fetchCexMessagesL();
-  await trades.fetchCexWaitingMessagesL();
   await trades.fetchDexMessages();
-  await trades.fetchDexWaitingMessages();
 
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
@@ -154,16 +135,6 @@ onMounted(async () => {
     trades.fetchDexMessages();
   }, 30000);
 
-  setInterval(() => {
-    trades.fetchDexWaitingMessages();
-  }, 30000);
-
-  setInterval(() => {
-    trades.fetchCexWaitingMessages();
-  }, 30000);
-  setInterval(() => {
-    trades.fetchCexWaitingMessagesL();
-  }, 30000);
 });
 
 onBeforeUnmount(() => {
@@ -174,9 +145,9 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .app-logo {
-  height: 100px;
+  height: 72px;
   /* 根据需求调整 */
-  width: auto;
+  width: 360px;
 }
 
 .app-container {
@@ -190,7 +161,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  padding: 20px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 14px;
@@ -256,6 +227,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 8px;
   z-index: 1000;
+  font-size: 36px;
 }
 
 .control-btn {
@@ -327,6 +299,11 @@ onBeforeUnmount(() => {
 .spinner {
   display: inline-block;
   animation: spin 1s linear infinite;
+  font-size: 36px;
+}
+
+.size {
+  font-size: 36px;
 }
 
 @keyframes spin {

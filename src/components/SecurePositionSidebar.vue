@@ -138,8 +138,8 @@
   /* 悬浮按钮：桌面置中，移动端右下角 */
   .sidebar-toggle {
     position: fixed;
-    right: max(24px, env(safe-area-inset-right));
-    top: 50%;
+    left: max(24px, env(safe-area-inset-right));
+    bottom: 1%;
     transform: translateY(-50%);
     z-index: 1100;
     width: 84px;

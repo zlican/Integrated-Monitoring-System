@@ -11,8 +11,7 @@ export interface CexMessagesResp {
   messages: CexMessage[];
 }
 
-// CEX等待区消息（与CexMessagesResp一致，前端拆分混合文本）
-export type CexWaitingMessagesResp = CexMessagesResp;
+
 
 // CEX消息类型
 export interface CexMessageL {
@@ -26,8 +25,6 @@ export interface CexMessagesRespL {
   messages: CexMessageL[];
 }
 
-// CEX等待区消息（与CexMessagesResp一致，前端拆分混合文本）
-export type CexWaitingMessagesRespL = CexMessagesRespL;
 
 // DEX消息类型
 export interface DexMessage {
