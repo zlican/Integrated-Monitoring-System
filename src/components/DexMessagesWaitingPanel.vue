@@ -1,7 +1,6 @@
 <template>
   <CardFrame :updatedAt="updatedAt">
     <template #title>DEX监控区</template>
-    <div v-if="error" class="error">{{ error }}</div>
     <ul v-if="messages && messages.length" class="messages-list">
       <li
         v-for="(message, idx) in messages"
@@ -14,7 +13,6 @@
         </div>
       </li>
     </ul>
-    <div v-else-if="!loading" class="no-data">暂无等待区消息</div>
   </CardFrame>
 </template>
 
