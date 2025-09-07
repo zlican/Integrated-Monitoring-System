@@ -54,7 +54,7 @@ const handleClick = (text: string) => {
   const symbolMatch = text.match(/([A-Z]{2,5})USDT/); // 匹配 ETHUSDT、BTCUSDT 等
   if (symbolMatch) {
     const symbol = symbolMatch[1]; // 取 ETH
-    const url = `https://www.bitget.com/zh-CN/futures/usdt/${symbol}USDT`;
+    const url = `https://www.binance.com/zh-CN/futures/${symbol}USDT`;
     window.open(url, '_blank');
     return;
   }
