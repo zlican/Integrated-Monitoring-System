@@ -72,7 +72,7 @@ export const useTradesStore = defineStore('trades', {
 
   actions: {
     // 获取CEX消息
-    async fetchCexMessages(limit: number = 10) {
+    async fetchCexMessages(limit: number = 25) {
       this.loading.cexMessages = true;
       this.error.cexMessages = null;
       
@@ -95,7 +95,7 @@ export const useTradesStore = defineStore('trades', {
       }
     },
         // 获取CEX消息
-        async fetchCexMessagesL(limit: number = 10) {
+        async fetchCexMessagesL(limit: number = 25) {
           this.loading.cexLong = true;
           this.error.cexLong = null;
           

@@ -1,15 +1,16 @@
 import type { CexMessage, CexMessagesResp, DexMessage, DexMessagesResp } from '@/types';
 // CEX消息API服务
 export class CexApiService {
-  private static async fetchCexMessages(limit: number = 10): Promise<CexMessage[]> {
-    const url = `http://192.168.1.11:8888/api/latest-tg-messages?limit=${limit}`;
+  private static async fetchCexMessages(limit: number = 25): Promise<CexMessage[]> {
+    //const url = `http://192.168.1.11:8888/api/latest-tg-messages?limit=${limit}`;
+    const url = `http://10.4.26.198:8888/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`请求CEX消息失败: ${res.statusText}`);
     }
     return await res.json();
   }
-  static async getLatestCexMessages(limit: number = 10): Promise<CexMessagesResp> {
+  static async getLatestCexMessages(limit: number = 25): Promise<CexMessagesResp> {
     try {
       const raw = await this.fetchCexMessages(limit);
   
@@ -17,6 +18,7 @@ export class CexApiService {
         _ts: number;
         _symbol: string;
         _direction: 'long' | 'short' | null;
+        _isOneMinute: boolean;
       };
   
       const msgs: Aug[] = raw
@@ -28,6 +30,7 @@ export class CexApiService {
             _ts: new Date(m.timestamp).getTime(),
             _symbol: symbol,
             _direction: extractDirection(m.text),
+            _isOneMinute: m.text.includes('(1m)'), 
           };
         })
         .filter((x): x is Aug => !!x);
@@ -37,7 +40,7 @@ export class CexApiService {
   
       const kept: Aug[] = [];
       const state: Record<string, { direction: 'long' | 'short' | null; lastInvalid: number }> = {};
-  
+      const now = Date.now(); // 当前时间戳
       for (const m of msgs) {
         const symbol = m._symbol;
   
@@ -52,7 +55,12 @@ export class CexApiService {
         }
         if (m._direction) {
           const st = state[symbol] ?? { direction: null, lastInvalid: -Infinity };
-        
+
+          // 如果消息是 (1m) 且超过6分钟（360秒），跳过
+          if (m._isOneMinute && now - m._ts > 360_000) {
+            continue;
+          }
+
           // 如果方向和之前不一样，清理掉 kept 中该 symbol 的旧方向
           if (st.direction && st.direction !== m._direction) {
             for (let i = kept.length - 1; i >= 0; i--) {
@@ -99,15 +107,16 @@ export class CexApiService {
     }
   }
   //长线
-  private static async fetchCexMessagesL(limit: number = 10): Promise<CexMessage[]> {
-    const url = `http://192.168.1.11:8888/api/latest-tg-messages-long?limit=${limit}`;
+  private static async fetchCexMessagesL(limit: number = 25): Promise<CexMessage[]> {
+    //const url = `http://192.168.1.11:8888/api/latest-tg-messages-long?limit=${limit}`;
+    const url = `http://10.4.26.198:8888/api/latest-tg-messages-long?limit=${limit}`;
     const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`请求CEX消息失败: ${res.statusText}`);
     }
     return await res.json();
   }
-  static async getLatestCexMessagesL(limit: number = 10): Promise<CexMessagesResp> {
+  static async getLatestCexMessagesL(limit: number = 25): Promise<CexMessagesResp> {
     try {
       const raw = await this.fetchCexMessagesL(limit);
   
@@ -215,7 +224,8 @@ function extractDirection(text: string): 'long' | 'short' | null {
 // DEX消息API服务
 export class DexApiService {
   private static async fetchDexMessages(limit: number = 25): Promise<DexMessage[]> {
-    const url = `http://192.168.1.11:8889/api/latest-tg-messages?limit=${limit}`;
+    //const url = `http://192.168.1.11:8889/api/latest-tg-messages?limit=${limit}`;
+    const url = `http://10.4.26.198:8889/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`请求DEX消息失败: ${res.statusText}`);
