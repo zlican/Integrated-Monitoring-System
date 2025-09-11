@@ -10,6 +10,7 @@
       <CexLongPanel :messages="displayedCexMessagesL" :loading="trades.loading.cexLong" :error="trades.error.cexLong" />
       <DexMessagesDeduplicatedPanel :messages="displayedDexMessages" :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages" />
+        <BanListPanel />
       <SecurePositionSidebar />
     </div>
 
@@ -29,6 +30,7 @@ import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
 import CexLongPanel from './components/CexLongPanel.vue';
 import SecurePositionSidebar from './components/SecurePositionSidebar.vue';
+import BanListPanel from './components/BanListPanel.vue';
 
 const trades = useTradesStore();
 
