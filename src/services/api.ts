@@ -1,8 +1,11 @@
 import type { CexMessage, CexMessagesResp, DexMessage, DexMessagesResp } from '@/types';
 // CEX消息API服务
+const ip = "192.168.1.12"
+
 export class CexApiService {
   private static async fetchCexMessages(limit: number = 25): Promise<CexMessage[]> {
-    const url = `http://192.168.1.11:8888/api/latest-tg-messages?limit=${limit}`;
+    const url = `http://${ip}:8888/api/latest-tg-messages?limit=${limit}`;
+    //const url = `http://192.168.1.102:8888/api/latest-tg-messages?limit=${limit}`;
     //const url = `http://10.4.26.198:8888/api/latest-tg-messages?limit=${limit}`;
     //const url = `http://172.20.10.3:8888/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
@@ -109,7 +112,8 @@ export class CexApiService {
   }
   //长线
   private static async fetchCexMessagesL(limit: number = 25): Promise<CexMessage[]> {
-    const url = `http://192.168.1.11:8888/api/latest-tg-messages-long?limit=${limit}`;
+    const url = `http://${ip}:8888/api/latest-tg-messages-long?limit=${limit}`;
+    //const url = `http://192.168.1.102:8888/api/latest-tg-messages-long?limit=${limit}`;
     //const url = `http://10.4.26.198:8888/api/latest-tg-messages-long?limit=${limit}`;
     //const url = `http://172.20.10.3:8888/api/latest-tg-messages-long?limit=${limit}`;
     const res = await fetch(url);
@@ -226,7 +230,8 @@ function extractDirection(text: string): 'long' | 'short' | null {
 // DEX消息API服务
 export class DexApiService {
   private static async fetchDexMessages(limit: number = 25): Promise<DexMessage[]> {
-    const url = `http://192.168.1.11:8889/api/latest-tg-messages?limit=${limit}`;
+    const url = `http://${ip}:8889/api/latest-tg-messages?limit=${limit}`;
+    //const url = `http://192.168.1.102:8889/api/latest-tg-messages?limit=${limit}`;
     //const url = `http://10.4.26.198:8889/api/latest-tg-messages?limit=${limit}`;
     //const url = `http://172.20.10.3:8889/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
