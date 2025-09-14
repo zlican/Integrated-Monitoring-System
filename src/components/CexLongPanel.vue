@@ -1,6 +1,6 @@
 <template>
   <CardFrame :updatedAt="updatedAt">
-    <template #title>CEX消息(长线)</template>
+    <template #title>CEX消息(中线)</template>
     <ul v-if="messages && messages.length > 0" class="messages-list">
       <li
         v-for="message in messages"

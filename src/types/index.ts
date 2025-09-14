@@ -25,6 +25,20 @@ export interface CexMessagesRespL {
   messages: CexMessageL[];
 }
 
+// CEX消息类型
+export interface CexMessageLB {
+  text: string;
+  timestamp: string;
+}
+
+// CEX消息响应类型
+export interface CexMessagesRespLB {
+  updatedAt: string;
+  messages: CexMessageLB[];
+}
+
+
+
 
 // DEX消息类型
 export interface DexMessage {

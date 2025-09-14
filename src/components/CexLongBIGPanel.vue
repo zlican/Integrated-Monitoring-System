@@ -1,6 +1,6 @@
 <template>
   <CardFrame :updatedAt="updatedAt">
-    <template #title>CEX消息(短线)</template>
+    <template #title>CEX消息(长线)</template>
     <ul v-if="messages && messages.length > 0" class="messages-list">
       <li
         v-for="message in messages"
@@ -24,12 +24,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { CexMessage } from '@/types';
+import type { CexMessageL } from '@/types';
 import CardFrame from './CardFrame.vue';
 import { formatTimeMessage } from '@/utils/format';
 
 const props = defineProps<{
-  messages: CexMessage[] | null;
+  messages: CexMessageL[] | null;
   loading: boolean;
   error: string | null;
   updatedAt?: string;
