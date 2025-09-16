@@ -362,7 +362,7 @@ export class DexApiService {
             if (match) symbol = match[1].toUpperCase();
           } else {
             // 普通信号：开头的🟢/⚠️ + 字母数字
-            const match = m.text.match(/^[⚠️🟢]*\s*([A-Z0-9]+)/i);
+            const match = m.text.match(/^[⚠️🟢]*\s*\$?([A-Za-z0-9]+)/);
             if (match) symbol = match[1].toUpperCase();
           }
   
