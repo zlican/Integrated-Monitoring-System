@@ -8,10 +8,10 @@
       <CexMessagesPanel :messages="displayedCexMessages" :loading="trades.loading.cexMessages"
         :error="trades.error.cexMessages" />
       <CexLongPanel :messages="displayedCexMessagesL" :loading="trades.loading.cexLong" :error="trades.error.cexLong" />
-      <CexLongBIGPanel :messages="displayedCexMessagesLB" :loading="trades.loading.cexLongBIG" :error="trades.error.cexLongBIG" />
       <DexMessagesDeduplicatedPanel :messages="displayedDexMessages" :loading="trades.loading.dexMessages"
         :error="trades.error.dexMessages" />
-        <BanListPanel />
+        <CexBanListPanel />
+        <DexBanListPanel />
         <SecurePosition />
     </div>
   </main>
@@ -23,8 +23,8 @@ import { useTradesStore } from '@/stores/trades';
 import CexMessagesPanel from '@/components/CexMessagesPanel.vue';
 import DexMessagesDeduplicatedPanel from '@/components/DexMessagesDeduplicatedPanel.vue';
 import CexLongPanel from './components/CexLongPanel.vue';
-import CexLongBIGPanel from './components/CexLongBIGPanel.vue';
-import BanListPanel from './components/BanListPanel.vue';
+import CexBanListPanel from './components/CexBanListPanel.vue';
+import DexBanListPanel from './components/DexBanListPanel.vue';
 import SecurePosition from './components/SecurePosition.vue';
 
 const trades = useTradesStore();
@@ -32,7 +32,7 @@ const trades = useTradesStore();
 const isOnline = ref(navigator.onLine);
 
 // 稳定引用，避免 CEX 消息闪烁
-import type { CexMessage, CexMessageL,CexMessageLB, DexMessage } from '@/types';
+import type { CexMessage, CexMessageL, DexMessage } from '@/types';
 const displayedCexMessages = ref<CexMessage[]>([]);
 watch(() => trades.cexMessages?.messages, (newMessages) => {
   if (!newMessages) {
@@ -65,21 +65,6 @@ watch(() => trades.cexMessagesL?.messages, (newMessages) => {
 }, { immediate: true });
 
 
-const displayedCexMessagesLB = ref<CexMessageLB[]>([]);
-watch(() => trades.cexMessagesLB?.messages, (newMessages) => {
-  if (!newMessages) {
-    displayedCexMessagesLB.value = [];
-    return;
-  }
-  const oldMap = new Map(displayedCexMessagesLB.value.map((m: CexMessage) => [m.timestamp, m]));
-  const updated = newMessages.map((m: CexMessage) => oldMap.get(m.timestamp) || m);
-  const oldKeys = displayedCexMessagesLB.value.map(m => m.timestamp).join(',');
-  const newKeys = updated.map(m => m.timestamp).join(',');
-  if (oldKeys !== newKeys) {
-    displayedCexMessagesLB.value = updated;
-  }
-}, { immediate: true });
-
 // 重点：稳定引用，避免 DEX 消息闪烁
 const displayedDexMessages = ref<DexMessage[]>([]);
 watch(() => trades.dexMessages?.messages, (newMessages) => {
@@ -105,7 +90,6 @@ onMounted(async () => {
   await trades.fetchCexMessages();
   await trades.fetchCexMessagesL();
   await trades.fetchDexMessages();
-  await trades.fetchCexMessagesLB();
 
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
@@ -116,9 +100,6 @@ onMounted(async () => {
   }, 30000);
   setInterval(() => {
     trades.fetchCexMessagesL();
-  }, 30000);
-  setInterval(() => {
-    trades.fetchCexMessagesLB();
   }, 30000);
 
   setInterval(() => {

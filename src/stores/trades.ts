@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { CexMessagesResp, DexMessagesResp, DexMessage, CexMessagesRespL, CexMessagesRespLB } from '@/types';
+import type { CexMessagesResp, DexMessagesResp, DexMessage, CexMessagesRespL } from '@/types';
 import { CexApiService, DexApiService } from '@/services/api';
 
 export const useTradesStore = defineStore('trades', {
@@ -8,13 +8,11 @@ export const useTradesStore = defineStore('trades', {
       cexMessages: false,
       dexMessages: false,
       cexLong:false,
-      cexLongBIG:false
     },
     error: {
       cexMessages: null as string | null,
       dexMessages: null as string | null,
       cexLong: null as string | null,
-      cexLongBIG: null as string | null,
     },
     
     // CEX消息相关状态
@@ -22,9 +20,6 @@ export const useTradesStore = defineStore('trades', {
     
     // CEX消息中线相关状态
     cexMessagesL: null as CexMessagesRespL | null,
-
-    // CEX消息长线相关状态
-    cexMessagesLB: null as CexMessagesRespLB | null,
     
     // DEX消息相关状态
     dexMessages: null as DexMessagesResp | null,
@@ -122,29 +117,6 @@ export const useTradesStore = defineStore('trades', {
             this.loading.cexLong = false;
           }
         },
-                // 获取CEX消息
-                async fetchCexMessagesLB(limit: number = 25) {
-                  this.loading.cexLongBIG = true;
-                  this.error.cexLongBIG = null;
-                  
-                  try {
-                    const messagesData = await CexApiService.getLatestCexMessagesLB(limit);
-                    this.cexMessagesLB = messagesData;
-                  } catch (error) {
-                    this.error.cexLongBIG = '获取CEX长线消息失败';
-                    console.error('Failed to fetch CEX messages:', error);
-                    
-                    // 如果API调用失败，使用模拟数据作为备用
-                    const fallbackData: CexMessagesRespLB = {
-                      updatedAt: new Date().toISOString(),
-                      messages: [
-                      ]
-                    };
-                    this.cexMessagesLB = fallbackData;
-                  } finally {
-                    this.loading.cexLongBIG = false;
-                  }
-                },
     // 获取DEX消息
     async fetchDexMessages(limit: number = 25) {
       this.loading.dexMessages = true;

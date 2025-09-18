@@ -1,6 +1,6 @@
 <template>
     <CardFrame :updatedAt="updatedAt">
-      <template #title>封禁区管理</template>
+      <template #title>CEX封禁区管理</template>
   
       <!-- 输入区域 -->
       <div class="ban-input">
@@ -40,11 +40,11 @@
   const loadingAdd = ref(false);
   const loadingRemove = ref('');
   const updatedAt = ref('');
-  const ip = "192.168.1.12"
+  const ip = "192.168.1.9"
   
   const fetchSymbols = async () => {
     try {
-      const res = await fetch(`http://${ip}:9001/ban/list`);
+      const res = await fetch(`http://${ip}:9001/cex/ban/list`);
       symbols.value = await res.json();
       updatedAt.value = new Date().toISOString();
     } catch (err) {
@@ -63,7 +63,7 @@
 
   loadingAdd.value = true;
   try {
-    await fetch(`http://${ip}:9001/ban/add`, {
+    await fetch(`http://${ip}:9001/cex/ban/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ symbol }),
@@ -80,7 +80,7 @@
   const handleRemove = async (symbol: string) => {
     loadingRemove.value = symbol;
     try {
-      await fetch(`http://${ip}:9001/ban/remove/${symbol}`, { method: 'DELETE' });
+      await fetch(`http://${ip}:9001/cex/ban/remove/${symbol}`, { method: 'DELETE' });
       fetchSymbols();
     } catch (err) {
       console.error('删除失败:', err);
