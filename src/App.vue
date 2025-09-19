@@ -97,14 +97,14 @@ onMounted(async () => {
 
   setInterval(() => {
     trades.fetchCexMessages();
-  }, 30000);
+  }, 10000);
   setInterval(() => {
     trades.fetchCexMessagesL();
   }, 30000);
 
   setInterval(() => {
     trades.fetchDexMessages();
-  }, 30000);
+  }, 10000);
 
 });
 

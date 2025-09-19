@@ -100,21 +100,21 @@ export class CexApiService {
   
 // 倒序返回
 kept.sort((a, b) => b._ts - a._ts);
-
+/*
 const FIFTEEN_MIN = 10 * 60 * 1000;
 const cutoff = now - FIFTEEN_MIN;
 
-// 查找最近 10 分钟内的 BTC/ETH 做空消息
+ // 查找最近 10 分钟内的 BTC/ETH 做空消息
 const hasRecentBTCShort = kept.some(
   m => m._symbol === 'BTCUSDT' && m._direction === 'short' && m._ts >= cutoff
 );
 const hasRecentETHShort = kept.some(
   m => m._symbol === 'ETHUSDT' && m._direction === 'short' && m._ts >= cutoff
 );
-
+ */
 let final = kept;
 
-if (hasRecentBTCShort || hasRecentETHShort) {
+/* if (hasRecentBTCShort || hasRecentETHShort) {
   // 🚫 只保留 BTC/ETH 做空的消息
   final = kept.filter(
     m =>
@@ -122,7 +122,7 @@ if (hasRecentBTCShort || hasRecentETHShort) {
       m._direction === 'short' &&
       m._ts >= cutoff
   );
-} 
+}  */
   
       const finalMessages: CexMessage[] = final.map(
         ({ _ts, _symbol, _direction, _isOneMinute, ...rest }) => rest
