@@ -5,9 +5,6 @@ const ip = "192.168.1.9"
 export class CexApiService {
   private static async fetchCexMessages(limit: number = 25): Promise<CexMessage[]> {
     const url = `http://${ip}:8888/api/latest-tg-messages?limit=${limit}`;
-    //const url = `http://192.168.1.102:8888/api/latest-tg-messages?limit=${limit}`;
-    //const url = `http://10.4.26.198:8888/api/latest-tg-messages?limit=${limit}`;
-    //const url = `http://172.20.10.3:8888/api/latest-tg-messages?limit=${limit}`;
     const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`请求CEX消息失败: ${res.statusText}`);
@@ -75,8 +72,8 @@ export class CexApiService {
           if (m._isOneMinute && now - m._ts > 360_000) {
             continue;
           }
-      // 🚫 新增：任何消息超过 30 分钟跳过
-      if (now - m._ts > 1_800_000) {
+      // 🚫 新增：任何消息超过 10 分钟跳过
+      if (now - m._ts > 600_000) {
         continue;
       }
           // 新方向不同 → 清理旧方向
@@ -104,10 +101,10 @@ export class CexApiService {
 // 倒序返回
 kept.sort((a, b) => b._ts - a._ts);
 
-const FIFTEEN_MIN = 15 * 60 * 1000;
+const FIFTEEN_MIN = 10 * 60 * 1000;
 const cutoff = now - FIFTEEN_MIN;
 
-// 查找最近 15 分钟内的 BTC/ETH 做空消息
+// 查找最近 10 分钟内的 BTC/ETH 做空消息
 const hasRecentBTCShort = kept.some(
   m => m._symbol === 'BTCUSDT' && m._direction === 'short' && m._ts >= cutoff
 );
@@ -197,8 +194,8 @@ if (hasRecentBTCShort || hasRecentETHShort) {
         if (m._direction) {
           const st = state[symbol] ?? { direction: null, lastInvalid: -Infinity };
 
-                // 🚫 新增：任何消息超过 60 分钟跳过
-      if (now - m._ts > 3_600_000) {
+                // 🚫 新增：任何消息超过 120 分钟跳过
+      if (now - m._ts > 7_200_000) {
         continue;
       }
           // 如果方向和之前不一样，清理掉 kept 中该 symbol 的旧方向

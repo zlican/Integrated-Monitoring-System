@@ -26,11 +26,11 @@ export const useTradesStore = defineStore('trades', {
   }),
 
   getters: {
-    // 获取最近半小时的去重DEX消息
+    // 获取最近 10 分钟的去重DEX消息
     recentDexMessagesDeduplicated: (state) => {
       if (!state.dexMessages?.messages) return [];
       
-      const halfHourAgo = Date.now() - 30 * 60 * 1000; // 15分钟前
+      const halfHourAgo = Date.now() - 10 * 60 * 1000; // 10分钟前
       
       // 过滤最近半小时的消息
       const recentMessages = state.dexMessages.messages.filter(msg => 
