@@ -104,13 +104,13 @@ const FIFTEEN_MIN = 10 * 60 * 1000; // 10分钟
 const cutoff = now - FIFTEEN_MIN;
 
 // 查找最近 10 分钟内的 BTC 做空消息
-const hasRecentBTCShort = kept.some(
+var hasRecentBTCShort = kept.some(
   m => m._symbol === 'BTCUSDT' && m._direction === 'short' && m._ts >= cutoff
 );
 
 let final = kept;
 
-if (hasRecentBTCShort) {
+if (false) {
   // 🚫 只保留 BTC/ETH/BNB/HYPE
   final = kept.filter(
     m =>
