@@ -12,6 +12,7 @@
         :error="trades.error.dexMessages" />
         <CexBanListPanel />
         <DexBanListPanel />
+        <AlertMessages />
         <SecurePosition />
     </div>
   </main>
@@ -26,6 +27,7 @@ import CexLongPanel from './components/CexLongPanel.vue';
 import CexBanListPanel from './components/CexBanListPanel.vue';
 import DexBanListPanel from './components/DexBanListPanel.vue';
 import SecurePosition from './components/SecurePosition.vue';
+import AlertMessages from './components/AlertMessages.vue';
 
 const trades = useTradesStore();
 
