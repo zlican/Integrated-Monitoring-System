@@ -197,7 +197,9 @@
   .message-text {
     margin: 0;
     white-space: pre-wrap;
-    font-size: var(--font-size);
+    font-family: inherit;   /* 这一行 */
+  font-size: var(--font-size);
+  line-height: 1.4;       /* 这一行 */
     color: #fff;
   }
   .reason {
